@@ -1,13 +1,37 @@
 #
-# ~/.bashrc
+# ${HOME}/.bashrc
 #
 
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
-alias ls='ls --color=auto'
-alias lg='lazygit'
-alias exmon='wlr-randr --output eDP-1 --off'
-alias grep='grep --color=auto'
-alias cls='clear && exa -1A'
-PS1='[\u@\h \W]\$ '
+# General
+alias \
+  cls='clear && exa -1A' \
+  exa="exa -A1" \
+  exmon='wlr-randr --output eDP-1 --off' \
+  grep='grep --color=auto' \
+  leet="nvim +Leet" \
+  ls='ls --color=auto' \
+  lg='lazygit' \
+  sourcez="source ${HOME}/.bashrc" \
+  wttr="curl wttr.in" \
+  v="nvim" \
+  vim="nvim"
+
+# Shortcuts
+alias \
+  cfb="\$EDITOR ${HOME}/.bashrc" \
+  ric="cd ${HOME}/Documents/ricardo && ${EDITOR} vault-root.md -c ObsidianToday" \
+  docs="cd ${HOME}/Documents/zettelkasten && ${EDITOR} ." \
+  cf="cd ${HOME}/.config" \
+  repo="cd ${HOME}/source/repos"
+
+# Shows git branch on shell prompt
+source /usr/share/git/completion/git-prompt.sh
+PS1='[\u@\h \W$(__git_ps1 " (%s)")]\$ '
+
+# Automatically start tmux if not already inside tmux
+if [ -z "$TMUX" ] && [ "$TERM" != "dumb" ]; then
+  exec tmux
+fi

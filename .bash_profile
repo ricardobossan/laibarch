@@ -6,6 +6,7 @@
 
 # Sets custom path for password-store
 export PASSWORD_STORE_DIR="$HOME/.local/share/password-store"
+export EDITOR="nvim"
 
 # Adds local executables to PATH
 export PATH=$PATH+=":${HOME}/.local/bin"
