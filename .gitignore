@@ -12,4 +12,6 @@
 !.local/share/bg
 !.local/share/ricing
 !.local/share/ricing/**/*
+!.local/bin/
+!.local/bin/configure-displays.sh
 !README.md
