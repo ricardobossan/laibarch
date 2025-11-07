@@ -22,7 +22,7 @@ alias \
 # Shortcuts
 alias \
   cfb="\$EDITOR ${HOME}/.bashrc" \
-  ric="cd ${HOME}/Documents/ricardo && ${EDITOR} vault-root.md -c ObsidianToday" \
+  ric="cd ${HOME}/Documents/ricardo && ${EDITOR} vault-root.md +ObsidianToday" \
   docs="cd ${HOME}/Documents/zettelkasten && ${EDITOR} ." \
   cf="cd ${HOME}/.config" \
   repo="cd ${HOME}/source/repos"
@@ -32,6 +32,7 @@ source /usr/share/git/completion/git-prompt.sh
 PS1='[\u@\h \W$(__git_ps1 " (%s)")]\$ '
 
 # Automatically start tmux if not already inside tmux
-if [ -z "$TMUX" ] && [ "$TERM" != "dumb" ]; then
+# Only auto-start in terminal emulators (pts), not on login TTY
+if [ -z "$TMUX" ] && [[ $(tty) == /dev/pts/* ]]; then
   exec tmux
 fi
