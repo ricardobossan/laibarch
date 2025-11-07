@@ -38,3 +38,9 @@ sudo make install
 
 # Brave
 curl -fsS https://dl.brave.com/install.sh | sh
+
+# rate-mirrors
+RATE_MIRRORS_DIR=${REPOS}/rate-mirrors
+git clone git@github.com:westandskif/rate-mirrors.git $RATE_MIRRORS_DIR
+cd $RATE_MIRRORS_DIR
+cargo build --release --locked

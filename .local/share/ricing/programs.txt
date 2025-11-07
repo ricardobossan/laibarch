@@ -4,6 +4,7 @@ bat
 curl
 diffutils
 fd
+rust
 git
 github-cli
 grep
@@ -44,3 +45,5 @@ syncthing
 wlr-randr
 fastfetch
 tmux
+obsidian
+obsidian-icon-theme
