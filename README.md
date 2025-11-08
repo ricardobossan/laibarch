@@ -2,8 +2,7 @@
 
 ~Life~ Arch is Life!
 
-<!--TODO: Download dwl and reconfigure with keyboard us variant intl -->
-<!--TODO: Install land configure waybar-->
+<!--TODO: Install and configure waybar, to show workspaces and which is selected currently-->
 <!--TODO: Research and install wallpaper manager for wayland, or stick to styli.sh-->
 <!--TODO: Configure dwl key bindings-->
 <!--TODO: Rice roslyn server setup for neovim locally in bootstrap.sh -->
