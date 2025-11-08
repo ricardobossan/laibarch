@@ -7,6 +7,3 @@ sleep 1
 
 # Configure displays
 ~/.local/bin/configure-displays.sh
-
-# Start waybar
-waybar &

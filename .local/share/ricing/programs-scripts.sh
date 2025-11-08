@@ -44,3 +44,9 @@ RATE_MIRRORS_DIR=${REPOS}/rate-mirrors
 git clone git@github.com:westandskif/rate-mirrors.git $RATE_MIRRORS_DIR
 cd $RATE_MIRRORS_DIR
 cargo build --release --locked
+
+# workstyle
+WORKSTYLE_REPOS=${REPOS}/workstyle
+git clone git@github.com:pierrechevalier83/workstyle.git $WORKSTYLE_REPOS
+cd $WORKSTYLE_REPOS
+cargo install workstyle

@@ -15,4 +15,7 @@
 !.local/bin/
 !.local/bin/configure-displays.sh
 !.local/bin/dwl-autostart.sh
+!.local/src/
+!.local/src/dwl
+!.local/src/dwl/**/*
 !README.md
