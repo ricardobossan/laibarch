@@ -16,5 +16,5 @@ export PATH=$PATH+=":${HOME}/.local/bin"
 # Executes dwl on start with automatic display configuration
 if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
   ~/.local/bin/dwl-autostart.sh &
-  exec dwl
+  slstatus -s | exec dwl
 fi
