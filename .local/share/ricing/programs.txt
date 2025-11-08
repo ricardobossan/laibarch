@@ -36,6 +36,8 @@ noto-fonts
 wayland
 wayland-protocols
 wlroots0.18
+waybar
+otf-font-awesome
 libinput
 libxkbcommon
 pixman
