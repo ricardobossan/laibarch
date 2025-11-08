@@ -5,21 +5,6 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
-# General
-alias \
-  cls='clear && exa -1A' \
-  exa="exa -A1" \
-  exmon='wlr-randr --output eDP-1 --off' \
-  grep='grep --color=auto' \
-  leet="nvim +Leet" \
-  ls='ls --color=auto' \
-  lg='lazygit' \
-  sourcez="source ${HOME}/.bashrc" \
-  wttr="curl wttr.in" \
-  v="nvim" \
-  vim="nvim" \
-  obsidian="obsidian --enable-features=UseOzonePlatform --ozone-platform=wayland"
-
 # mupdf wrapper with automatic XWayland management
 mupdf() {
   if [ $# -eq 0 ]; then
@@ -32,9 +17,9 @@ mupdf() {
   local started_xwayland=false
 
   # Check if XWayland is already running on our display
-  if ! pgrep -f "Xwayland ${display_num}" > /dev/null; then
+  if ! pgrep -f "Xwayland ${display_num}" >/dev/null; then
     # Start XWayland in background
-    Xwayland ${display_num} -ac > /dev/null 2>&1 &
+    Xwayland ${display_num} -ac >/dev/null 2>&1 &
     xwayland_pid=$!
     started_xwayland=true
 
@@ -50,6 +35,22 @@ mupdf() {
     kill $xwayland_pid 2>/dev/null
   fi
 }
+
+# General
+alias \
+  cls='clear && exa -1A' \
+  exa="exa -A1" \
+  exmon='wlr-randr --output eDP-1 --off' \
+  grep='grep --color=auto' \
+  leet="nvim +Leet" \
+  ls='ls --color=auto' \
+  lg='lazygit' \
+  sourcez="source ${HOME}/.bashrc" \
+  wttr="curl wttr.in" \
+  v="nvim" \
+  vim="nvim" \
+  obsidian="obsidian --enable-features=UseOzonePlatform --ozone-platform=wayland" \
+  calcurse="calcurse -D ${HOME}/Documents/calcurse"
 
 # Shortcuts
 alias \
