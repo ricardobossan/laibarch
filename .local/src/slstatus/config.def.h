@@ -66,12 +66,12 @@ static const char unknown_str[] = "n/a";
  */
 static const struct arg args[] = {
     /* function         format                          argument */
-    { cpu_perc,         "CPU %s%% | ",                  NULL },
-    { ram_perc,         "RAM %s%% | ",                  NULL },
-    { temp,             "TEMP %s°C | ",                 "/sys/class/thermal/thermal_zone0/temp" },
-    { run_command,      "NET %s ",                      "nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d':' -f2 | head -1" },
-    { run_command,      "(%s%%) | ",                    "nmcli -t -f in-use,signal dev wifi | grep '^\\*' | cut -d':' -f2" },
-    { run_command,      "VOL %s%% | ",                  "amixer sget Master | awk -F'[][]' '/Left:/ { print $2 }' | tr -d '%'" },
-    { battery_perc,     "BAT %s%% | ",                  "BAT0" },
-    { datetime,         "%s",                           "%a %b %d %l:%M %p" },
+    { cpu_perc,         "^c#61AFEF^󰍛 %s%% │ ",         NULL },
+    { ram_perc,         "^c#E06C75^󰑭 %s%% │ ",         NULL },
+    { temp,             "^c#E5C07B^🌡 %s°C │ ",         "/sys/class/thermal/thermal_zone0/temp" },
+    { run_command,      "^c#98C379^📶 %s ",             "nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d':' -f2 | head -1" },
+    { run_command,      "(%s%%) │ ",                    "nmcli -t -f in-use,signal dev wifi | grep '^\\*' | cut -d':' -f2" },
+    { run_command,      "^c#C678DD^🔊 %s%% │ ",         "amixer sget Master | awk -F'[][]' '/Left:/ { print $2 }' | tr -d '%'" },
+    { battery_perc,     "^c#56B6C2^🔋 %s%% │ ",         "BAT0" },
+    { datetime,         "^c#D19A66^⏰ %s",              "%a %b %d %l:%M %p" },
 };

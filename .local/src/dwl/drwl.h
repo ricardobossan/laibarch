@@ -30,6 +30,7 @@
 #pragma once
 
 #include <stdlib.h>
+#include <string.h>
 #include <fcft/fcft.h>
 #include <pixman-1/pixman.h>
 
@@ -222,6 +223,28 @@ drwl_text(Drwl *drwl,
 		eg = fcft_rasterize_char_utf32(drwl->font, 0x2026 /* … */, fcft_subpixel_mode);
 
 	for (const char *p = text, *pp; pp = p, *p; p++) {
+		/* Parse color codes: ^c#RRGGBB^ */
+		if (*p == '^' && *(p+1) == 'c' && *(p+2) == '#' && strlen(p) >= 10) {
+			if (render) {
+				char hexcol[7];
+				memcpy(hexcol, p + 3, 6);
+				hexcol[6] = '\0';
+
+				unsigned long col = strtoul(hexcol, NULL, 16);
+				uint32_t new_color = (col << 8) | 0xFF;
+
+				pixman_image_unref(fg_pix);
+				clr = convert_color(new_color);
+				fg_pix = pixman_image_create_solid_fill(&clr);
+			}
+
+			p += 9;
+			if (*p == '^')
+				p++;
+			if (!*p)
+				break;
+		}
+
 		for (state = UTF8_ACCEPT; *p &&
 		     utf8decode(&state, &cp, *p) > UTF8_REJECT; p++)
 			;
