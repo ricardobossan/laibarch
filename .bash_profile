@@ -13,6 +13,14 @@ export XKB_DEFAULT_VARIANT=intl
 # Adds local executables to PATH
 export PATH=$PATH+=":${HOME}/.local/bin"
 
+# Start SSH agent if not running
+if ! pgrep -u "$USER" ssh-agent > /dev/null; then
+  ssh-agent -t 1h > "$XDG_RUNTIME_DIR/ssh-agent.env"
+fi
+if [[ ! -f "$SSH_AUTH_SOCK" ]]; then
+  source "$XDG_RUNTIME_DIR/ssh-agent.env" >/dev/null
+fi
+
 # Executes dwl on start with automatic display configuration
 if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
   slstatus -s | exec dwl -s ~/.local/bin/dwl-autostart.sh

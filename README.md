@@ -2,5 +2,5 @@
 
 ~Life~ Arch is Life!
 
-<!--TODO: Blue light filter for wayland-->
 <!--TODO: automate dwl installation from docs into the bootstrap script-->
+<!--TODO: Test on new VM my ricing public settings so they work independently of my private settings.-->
