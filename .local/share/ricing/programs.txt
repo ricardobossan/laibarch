@@ -9,6 +9,7 @@ git
 github-cli
 grep
 htop
+wget
 npm
 nodejs
 jq
@@ -43,6 +44,8 @@ wl-clipboard-history
 wl-clip-persist
 otf-font-awesome
 wmenu
+swww
+swww-daemon
 nwg-displays
 swayimg
 mako
