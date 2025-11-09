@@ -132,6 +132,8 @@ static const char *termcmd[] = { "alacritty", NULL };
 static const char *menucmd[] = { "wmenu-run",
   "-f", "JetBrainsMono Nerd Font 10", "-l", "10",
   NULL };
+static const char *volup[]   = { "wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%+", NULL };
+static const char *voldown[] = { "wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%-", NULL };
 
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
@@ -163,6 +165,8 @@ static const Key keys[] = {
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_greater,    tagmon,         {.i = WLR_DIRECTION_RIGHT} },
   { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_S,          spawn,          SHCMD("geom=\"$(slurp -f '%x,%y %wx%h')\"; grim -l 0 -g \"$geom\" - | wl-copy") },
   { MODKEY                   , XKB_KEY_w,          spawn,          SHCMD("brave") },
+	{ MODKEY,                    XKB_KEY_equal,      spawn,          {.v = volup} },
+	{ MODKEY,                    XKB_KEY_minus,      spawn,          {.v = voldown} },
 	TAGKEYS(          XKB_KEY_1, XKB_KEY_exclam,                     0),
 	TAGKEYS(          XKB_KEY_2, XKB_KEY_at,                         1),
 	TAGKEYS(          XKB_KEY_3, XKB_KEY_numbersign,                 2),
