@@ -2,6 +2,13 @@
 # Simple bootstrap for fresh Arch install
 # Run from: ~/source/repos/laibarch-deprecated/scripts/bootstrap.sh
 
+# Build and install dwl and slstatus from patched source
+echo "Building and installing slstatus..."
+sudo make -C ${HOME}/.local/src/slstatus/ clean install
+echo "Building and installing dwl..."
+sudo make -C ${HOME}/.local/src/dwl/ clean install
+echo "dwl and slstatus installed successfully!"
+
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 # Install yay, brave, neovim
