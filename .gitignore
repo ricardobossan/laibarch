@@ -18,6 +18,8 @@
 !.local/src/
 !.local/src/dwl
 !.local/src/dwl/**/*
+.local/src/dwl/config.h
 !.local/src/slstatus
 !.local/src/slstatus/**/*
+.local/src/slstatus/config.h
 !README.md
