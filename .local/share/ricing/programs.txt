@@ -61,3 +61,5 @@ fastfetch
 tmux
 obsidian
 obsidian-icon-theme
+gammastep
+geoclue
