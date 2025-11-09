@@ -2,5 +2,5 @@
 
 ~Life~ Arch is Life!
 
-<!--TODO: Configure dwl key bindings-->
+<!--TODO: Blue light filter for wayland-->
 <!--TODO: automate dwl installation from docs into the bootstrap script-->
