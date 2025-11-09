@@ -1586,6 +1586,10 @@ drawbar(Monitor *m)
 	if (!(buf = bufmon(m)))
 		return;
 
+	/* draw black background for entire bar */
+	drwl_setscheme(m->drw, colors[SchemeNorm]);
+	drwl_rect(m->drw, 0, 0, m->b.width, m->b.height, 1, 1);
+
 	/* draw status first so it can be overdrawn by tags later */
 	if (m == selmon) { /* status is only drawn on selected monitor */
 		drwl_setscheme(m->drw, colors[SchemeNorm]);
