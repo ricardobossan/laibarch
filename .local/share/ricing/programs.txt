@@ -40,12 +40,11 @@ wlroots0.19
 fcft 
 tllist
 wl-clipboard
-wl-clipboard-history
+cliphist
 wl-clip-persist
 otf-font-awesome
 wmenu
 swww
-swww-daemon
 nwg-displays
 swayimg
 mako
