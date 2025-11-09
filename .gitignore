@@ -18,4 +18,6 @@
 !.local/src/
 !.local/src/dwl
 !.local/src/dwl/**/*
+!.local/src/slstatus
+!.local/src/slstatus/**/*
 !README.md
