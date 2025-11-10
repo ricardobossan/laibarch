@@ -50,7 +50,9 @@ alias \
   v="nvim" \
   vim="nvim" \
   obsidian="obsidian --enable-features=UseOzonePlatform --ozone-platform=wayland" \
-  calcurse="calcurse -D ${HOME}/Documents/calcurse"
+  calcurse="calcurse -D ${HOME}/Documents/calcurse" \
+  fd="fd -iH" \
+  rg="rg -iH"
 
 # Shortcuts
 alias \
