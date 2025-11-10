@@ -198,6 +198,8 @@ typedef struct {
 	uint32_t data[];
 } Buffer;
 
+#define MAX_STATUS_WIDGETS 16
+
 struct Monitor {
 	struct wl_list link;
 	struct wlr_output *wlr_output;
@@ -230,6 +232,8 @@ struct Monitor {
 	Drwl *drw;
 	Buffer *pool[2];
 	int lrpad;
+	StatusWidget status_widgets[MAX_STATUS_WIDGETS];
+	int status_widget_count;
 };
 
 typedef struct {
@@ -364,6 +368,8 @@ static void setpsel(struct wl_listener *listener, void *data);
 static void setsel(struct wl_listener *listener, void *data);
 static void setup(void);
 static void spawn(const Arg *arg);
+static void widgetclick_left(const Arg *arg);
+static void widgetclick_right(const Arg *arg);
 static void startdrag(struct wl_listener *listener, void *data);
 static int statusin(int fd, unsigned int mask, void *data);
 static void tag(const Arg *arg);
@@ -787,6 +793,14 @@ buttonpress(struct wl_listener *listener, void *data)
 				click = ClkLtSymbol;
 			else if (cx > selmon->b.width - (TEXTW(selmon, stext) - selmon->lrpad + 2)) {
 				click = ClkStatus;
+				/* Find which widget was clicked */
+				for (i = 0; i < selmon->status_widget_count; i++) {
+					if (cx >= selmon->status_widgets[i].x_start &&
+					    cx < selmon->status_widgets[i].x_end) {
+						arg.v = (void*)selmon->status_widgets[i].name;
+						break;
+					}
+				}
 			} else
 				click = ClkTitle;
 		}
@@ -800,7 +814,7 @@ buttonpress(struct wl_listener *listener, void *data)
 		mods = keyboard ? wlr_keyboard_get_modifiers(keyboard) : 0;
 		for (b = buttons; b < END(buttons); b++) {
 			if (CLEANMASK(mods) == CLEANMASK(b->mod) && event->button == b->button && click == b->click && b->func) {
-				b->func(click == ClkTagBar && b->arg.i == 0 ? &arg : &b->arg);
+				b->func((click == ClkTagBar && b->arg.i == 0) || click == ClkStatus ? &arg : &b->arg);
 				return;
 			}
 		}
@@ -1594,7 +1608,9 @@ drawbar(Monitor *m)
 	if (m == selmon) { /* status is only drawn on selected monitor */
 		drwl_setscheme(m->drw, colors[SchemeNorm]);
 		tw = TEXTW(m, stext) - m->lrpad + 2; /* 2px right padding */
-		drwl_text(m->drw, m->b.width - tw, 0, tw, m->b.height, 0, stext, 0);
+		m->status_widget_count = 0; /* reset widget count */
+		drwl_text(m->drw, m->b.width - tw, 0, tw, m->b.height, 0, stext, 0,
+			m->status_widgets, &m->status_widget_count, MAX_STATUS_WIDGETS);
 	}
 
 	wl_list_for_each(c, &clients, link) {
@@ -1609,18 +1625,21 @@ drawbar(Monitor *m)
 	for (i = 0; i < LENGTH(tags); i++) {
 		w = TEXTW(m, tags[i]);
 		drwl_setscheme(m->drw, colors[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
-		drwl_text(m->drw, x, 0, w, m->b.height, m->lrpad / 2, tags[i], urg & 1 << i);
+		drwl_text(m->drw, x, 0, w, m->b.height, m->lrpad / 2, tags[i], urg & 1 << i,
+			NULL, NULL, 0);
 		/* Removed occupied tag indicator boxes */
 		x += w;
 	}
 	w = TEXTW(m, m->ltsymbol);
 	drwl_setscheme(m->drw, colors[SchemeNorm]);
-	x = drwl_text(m->drw, x, 0, w, m->b.height, m->lrpad / 2, m->ltsymbol, 0);
+	x = drwl_text(m->drw, x, 0, w, m->b.height, m->lrpad / 2, m->ltsymbol, 0,
+		NULL, NULL, 0);
 
 	if ((w = m->b.width - tw - x) > m->b.height) {
 		if (c) {
 			drwl_setscheme(m->drw, colors[m == selmon ? SchemeSel : SchemeNorm]);
-			drwl_text(m->drw, x, 0, w, m->b.height, m->lrpad / 2, client_get_title(c), 0);
+			drwl_text(m->drw, x, 0, w, m->b.height, m->lrpad / 2, client_get_title(c), 0,
+				NULL, NULL, 0);
 			if (c && c->isfloating)
 				drwl_rect(m->drw, x + boxs, boxs, boxw, boxw, 0, 0);
 		} else {
@@ -2911,6 +2930,67 @@ setup(void)
 		fprintf(stderr, "failed to setup XWayland X server, continuing without it\n");
 	}
 #endif
+}
+
+void
+widgetclick(const Arg *arg, const char *button)
+{
+	const char *widget = arg->v;
+	if (!widget)
+		return;
+
+	if (fork() == 0) {
+		close(STDIN_FILENO);
+		dup2(STDERR_FILENO, STDOUT_FILENO);
+		setsid();
+		execlp("/bin/sh", "sh", "-c",
+			(char *[]){"/bin/sh", "-c", NULL, NULL}[0],
+			widget, button, NULL);
+		/* Build command string */
+		char cmd[512];
+		snprintf(cmd, sizeof(cmd), "%s/.local/bin/dwl-status-click.sh %s %s",
+			getenv("HOME"), widget, button);
+		execlp("/bin/sh", "sh", "-c", cmd, NULL);
+		die("dwl: failed to execute widget click handler");
+	}
+}
+
+void
+widgetclick_left(const Arg *arg)
+{
+	const char *widget = arg->v;
+	if (!widget)
+		return;
+
+	if (fork() == 0) {
+		close(STDIN_FILENO);
+		dup2(STDERR_FILENO, STDOUT_FILENO);
+		setsid();
+		char cmd[512];
+		snprintf(cmd, sizeof(cmd), "%s/.local/bin/dwl-status-click.sh %s 1",
+			getenv("HOME"), widget);
+		execlp("/bin/sh", "sh", "-c", cmd, NULL);
+		die("dwl: failed to execute widget click handler");
+	}
+}
+
+void
+widgetclick_right(const Arg *arg)
+{
+	const char *widget = arg->v;
+	if (!widget)
+		return;
+
+	if (fork() == 0) {
+		close(STDIN_FILENO);
+		dup2(STDERR_FILENO, STDOUT_FILENO);
+		setsid();
+		char cmd[512];
+		snprintf(cmd, sizeof(cmd), "%s/.local/bin/dwl-status-click.sh %s 3",
+			getenv("HOME"), widget);
+		execlp("/bin/sh", "sh", "-c", cmd, NULL);
+		die("dwl: failed to execute widget click handler");
+	}
 }
 
 void

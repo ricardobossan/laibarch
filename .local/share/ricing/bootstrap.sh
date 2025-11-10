@@ -11,6 +11,13 @@ echo "dwl and slstatus installed successfully!"
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
+# Install dwl status click handler
+echo "Installing status bar click handler..."
+mkdir -p ${HOME}/.local/bin
+cp "$REPO_ROOT/ricing/dwl-status-click.sh" ${HOME}/.local/bin/
+chmod +x ${HOME}/.local/bin/dwl-status-click.sh
+echo "Click handler installed successfully!"
+
 # Install yay, brave, neovim
 bash "$REPO_ROOT/ricing/programs-scripts.sh"
 

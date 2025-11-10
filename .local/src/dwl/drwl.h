@@ -40,6 +40,12 @@ typedef struct fcft_font Fnt;
 typedef pixman_image_t Img;
 
 typedef struct {
+	char name[32];
+	int x_start;
+	int x_end;
+} StatusWidget;
+
+typedef struct {
 	Img *image;
 	Fnt *font;
 	uint32_t *scheme;
@@ -189,7 +195,8 @@ drwl_rect(Drwl *drwl,
 static int
 drwl_text(Drwl *drwl,
 		int x, int y, unsigned int w, unsigned int h,
-		unsigned int lpad, const char *text, int invert)
+		unsigned int lpad, const char *text, int invert,
+		StatusWidget *widgets, int *widget_count, int max_widgets)
 {
 	int ty;
 	int render = x || y || w || h;
@@ -222,7 +229,38 @@ drwl_text(Drwl *drwl,
 	if (render)
 		eg = fcft_rasterize_char_utf32(drwl->font, 0x2026 /* … */, fcft_subpixel_mode);
 
+	int current_widget_idx = -1;
+
 	for (const char *p = text, *pp; pp = p, *p; p++) {
+		/* Parse widget markers: ^w<name>^ */
+		if (*p == '^' && *(p+1) == 'w') {
+			/* Finalize previous widget */
+			if (current_widget_idx >= 0 && widgets) {
+				widgets[current_widget_idx].x_end = x;
+			}
+
+			/* Find widget name end */
+			const char *name_start = p + 2;
+			const char *name_end = strchr(name_start, '^');
+			if (name_end && widgets && widget_count && *widget_count < max_widgets) {
+				int name_len = name_end - name_start;
+				if (name_len > 0 && name_len < 32) {
+					strncpy(widgets[*widget_count].name, name_start, name_len);
+					widgets[*widget_count].name[name_len] = '\0';
+					widgets[*widget_count].x_start = x;
+					current_widget_idx = *widget_count;
+					(*widget_count)++;
+				}
+			}
+
+			/* Skip widget marker */
+			p = name_end ? name_end : p + 2;
+			if (*p == '^')
+				p++;
+			if (!*p)
+				break;
+		}
+
 		/* Parse color codes: ^c#RRGGBB^ */
 		if (*p == '^' && *(p+1) == 'c' && *(p+2) == '#' && strlen(p) >= 10) {
 			if (render) {
@@ -268,7 +306,7 @@ drwl_text(Drwl *drwl,
 		if (render && !noellipsis && x_kern + glyph->advance.x + eg->advance.x > w &&
 		    *(p + 1) != '\0') {
 			/* cannot fit ellipsis after current codepoint */
-			if (drwl_text(drwl, 0, 0, 0, 0, 0, pp, 0) + x_kern <= w) {
+			if (drwl_text(drwl, 0, 0, 0, 0, 0, pp, 0, NULL, NULL, 0) + x_kern <= w) {
 				noellipsis = 1;
 			} else {
 				w -= eg->advance.x;
@@ -297,6 +335,11 @@ drwl_text(Drwl *drwl,
 		w -= glyph->advance.x;
 	}
 
+	/* Finalize last widget */
+	if (current_widget_idx >= 0 && widgets) {
+		widgets[current_widget_idx].x_end = x;
+	}
+
 	if (render)
 		pixman_image_unref(fg_pix);
 
@@ -308,7 +351,7 @@ drwl_font_getwidth(Drwl *drwl, const char *text)
 {
 	if (!drwl || !drwl->font || !text)
 		return 0;
-	return drwl_text(drwl, 0, 0, 0, 0, 0, text, 0);
+	return drwl_text(drwl, 0, 0, 0, 0, 0, text, 0, NULL, NULL, 0);
 }
 
 static void
