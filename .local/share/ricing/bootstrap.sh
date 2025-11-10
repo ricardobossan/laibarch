@@ -30,4 +30,36 @@ echo "Package installation complete!"
 # Stow system configs
 #cd "$REPO_ROOT/root" && sudo stow -t / .
 
+# Enable and start system services
+echo ""
+echo "Enabling and starting system services..."
+
+# Network services
+sudo systemctl enable --now NetworkManager && echo "  ✓ NetworkManager"
+sudo systemctl enable --now systemd-resolved && echo "  ✓ systemd-resolved"
+
+# Mirror list updater
+sudo systemctl enable --now reflector && echo "  ✓ reflector"
+
+# Location services for gammastep
+if systemctl list-unit-files | grep -q '^geoclue.service'; then
+    sudo systemctl enable --now geoclue && echo "  ✓ geoclue"
+fi
+
+# SSD TRIM (recommended for SSD health)
+sudo systemctl enable --now fstrim.timer && echo "  ✓ fstrim.timer"
+
+# User services
+echo "Enabling user services..."
+
+# Audio stack
+systemctl --user enable --now pipewire && echo "  ✓ pipewire"
+systemctl --user enable --now pipewire-pulse && echo "  ✓ pipewire-pulse"
+systemctl --user enable --now wireplumber && echo "  ✓ wireplumber"
+
+# File syncing
+systemctl --user enable --now syncthing && echo "  ✓ syncthing"
+
+echo "Service setup complete!"
+echo ""
 echo "Done! Reboot and dwl should start."
