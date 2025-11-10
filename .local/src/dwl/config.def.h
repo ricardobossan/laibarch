@@ -132,6 +132,9 @@ static const char *termcmd[] = { "alacritty", NULL };
 static const char *menucmd[] = { "wmenu-run",
   "-f", "JetBrainsMono Nerd Font 10", "-l", "10",
   NULL };
+static const char *clipmenu[] = { "/bin/sh", "-c",
+  "cliphist list | wmenu -f 'JetBrainsMono Nerd Font 10' -l 10 | cliphist decode | wl-copy",
+  NULL };
 static const char *volup[]   = { "wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%+", NULL };
 static const char *voldown[] = { "wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%-", NULL };
 
@@ -139,6 +142,7 @@ static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
 	/* modifier                  key                 function        argument */
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_d,          spawn,          {.v = menucmd} },
+	{ MODKEY,                    XKB_KEY_v,          spawn,          {.v = clipmenu} },
 	{ MODKEY,                    XKB_KEY_Return,     spawn,          {.v = termcmd} },
 	{ MODKEY,                    XKB_KEY_b,          togglebar,      {0} },
 	{ MODKEY,                    XKB_KEY_j,          focusstack,     {.i = +1} },

@@ -63,3 +63,5 @@ obsidian
 obsidian-icon-theme
 gammastep
 geoclue
+libnotify
+python-pip
