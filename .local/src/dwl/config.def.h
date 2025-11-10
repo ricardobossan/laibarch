@@ -141,7 +141,7 @@ static const char *voldown[] = { "wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", 
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
 	/* modifier                  key                 function        argument */
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_d,          spawn,          {.v = menucmd} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_D,          spawn,          {.v = menucmd} },
 	{ MODKEY,                    XKB_KEY_v,          spawn,          {.v = clipmenu} },
 	{ MODKEY,                    XKB_KEY_Return,     spawn,          {.v = termcmd} },
 	{ MODKEY,                    XKB_KEY_b,          togglebar,      {0} },
