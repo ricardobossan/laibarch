@@ -65,3 +65,6 @@ gammastep
 geoclue
 libnotify
 python-pip
+python-pipx
+ksnip
+translate-shell

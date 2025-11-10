@@ -169,7 +169,11 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_period,     focusmon,       {.i = WLR_DIRECTION_RIGHT} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_less,       tagmon,         {.i = WLR_DIRECTION_LEFT} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_greater,    tagmon,         {.i = WLR_DIRECTION_RIGHT} },
-  { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_S,          spawn,          SHCMD("geom=\"$(slurp -f '%x,%y %wx%h')\"; grim -l 0 -g \"$geom\" - | wl-copy") },
+  /* Screenshot keybindings */
+  { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_S,          spawn,          SHCMD("screenshot.sh selection-clipboard") },
+  { MODKEY,                    XKB_KEY_p,          spawn,          SHCMD("screenshot.sh fullscreen") },
+  { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_P,          spawn,          SHCMD("screenshot.sh selection") },
+  { MODKEY|WLR_MODIFIER_CTRL,  XKB_KEY_p,          spawn,          SHCMD("screenshot.sh output") },
   { MODKEY                   , XKB_KEY_w,          spawn,          SHCMD("brave") },
 	{ MODKEY,                    XKB_KEY_equal,      spawn,          {.v = volup} },
 	{ MODKEY,                    XKB_KEY_minus,      spawn,          {.v = voldown} },
