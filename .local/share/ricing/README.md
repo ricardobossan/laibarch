@@ -7,6 +7,8 @@ Automated setup for DWL Wayland compositor with slstatus bar on Arch Linux.
 - Basic Arch Linux installation completed
 - System partitioned, formatted, and bootloader installed
 - System booted into the installation
+- This repository cloned or copied to the user's home directory
+  - Contains patched dwl and slstatus sources at `~/.local/src/`
 
 ## Section 1: Standard Setup
 
@@ -28,7 +30,7 @@ bash run-section1.sh
 **System packages** (from `programs.txt`):
 - Terminal: `alacritty`, `foot`
 - Shell: `stow`, `bat`, `fd`, `ripgrep`, `htop`, `tmux`
-- Development: `git`, `github-cli`, `rust`, `nodejs`, `npm`
+- Development: `git`, `github-cli`, `rust`, `nodejs`, `npm`, `cmake`, `base-devel`, `pkg-config`
 - Wayland: `wlroots`, `wayland-protocols`, `wl-clipboard`, `cliphist`, `wmenu`, `swww`
 - Utilities: `mako`, `grim`, `slurp`, `gammastep`, `geoclue`
 - Applications: `mpv`, `mupdf`, `zathura`, `yazi`, `calcurse`, `obsidian`, `syncthing`
@@ -77,10 +79,11 @@ Then automatically:
 ### Execution Flow
 
 ```
-run-section2.sh (as root):
+run-section2.sh (as root from pendrive):
   ├─> Configure root password (interactive)
   ├─> Configure sudo/wheel group
   ├─> Create user (interactive)
+  ├─> Copy repository from pendrive to user home directory
   ├─> configure-pacman.sh (initialize keyring, enable parallel downloads)
   ├─> Get WiFi credentials (interactive, for reconnection)
   ├─> run-section1.sh (as new user)
@@ -139,26 +142,48 @@ reboot
 ## File Structure
 
 ```
-.
-├── run-section1.sh           # Master script: Standard setup
-├── run-section2.sh           # Master script: Complete fresh install
-├── bootstrap.sh              # Build DWL/slstatus, install packages
-├── programs-scripts.sh       # Build programs from source
-├── configure-pacman.sh       # Initialize pacman keyring
-├── configure-network.sh      # NetworkManager + iwd setup
-├── programs.txt              # Pacman package list
-└── dwl-status-click.sh       # Status bar click handler
+~ (home directory)
+├── .local/
+│   ├── src/
+│   │   ├── dwl/              # Patched dwl source (part of repo)
+│   │   └── slstatus/         # Patched slstatus source (part of repo)
+│   └── share/
+│       └── ricing/           # This directory
+│           ├── run-section1.sh           # Master: Standard setup
+│           ├── run-section2.sh           # Master: Complete fresh install
+│           ├── bootstrap.sh              # Build DWL/slstatus, install packages
+│           ├── programs-scripts.sh       # Build programs from source
+│           ├── configure-pacman.sh       # Initialize pacman keyring
+│           ├── configure-network.sh      # NetworkManager + iwd setup
+│           ├── programs.txt              # Pacman package list
+│           └── dwl-status-click.sh       # Status bar click handler
 ```
 
-## Requirements
+## Repository Setup
 
-- DWL and slstatus source must be at `~/.local/src/dwl` and `~/.local/src/slstatus`
-- For `programs-scripts.sh`: repositories will be cloned to `~/source/repos/`
-- For Section 2: Run from pendrive with script directory accessible
+### For Section 1 (existing system):
+```bash
+# Clone repo to home directory
+cd ~
+git clone <repo-url> .
+```
+
+### For Section 2 (fresh install from pendrive):
+1. Clone/copy this repository to a pendrive
+2. Boot fresh Arch install
+3. Mount pendrive and navigate to the scripts directory:
+   ```bash
+   mount /dev/sdX1 /mnt  # Replace sdX1 with your pendrive
+   cd /mnt/.local/share/ricing
+   sudo bash run-section2.sh
+   ```
+4. The script will automatically copy the repository to the new user's home
 
 ## Notes
 
-- All master scripts use relative paths from their location (pendrive-safe)
+- Repo includes patched dwl/slstatus sources at `~/.local/src/`
+- All scripts use relative paths (pendrive-safe)
 - `run-section2.sh` must be run as root
-- `run-section1.sh` can be run as regular user
-- WiFi credentials are only used temporarily for reconnection (not stored)
+- `run-section1.sh` runs as regular user
+- WiFi credentials used only for reconnection (not stored)
+- External programs cloned to `~/source/repos/`

@@ -21,6 +21,9 @@ openssl
 ripgrep
 unzip
 zip
+cmake
+base-devel
+pkg-config
 mupdf
 mpv
 yazi

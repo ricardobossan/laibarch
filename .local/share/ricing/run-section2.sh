@@ -51,6 +51,27 @@ echo "Set password for user $NEW_USER:"
 passwd "$NEW_USER"
 echo ""
 
+# Step 3.5: Copy repository to user's home
+echo "Step 3.5: Copying repository to user home..."
+echo "--------------------------------"
+# Get the parent directory of SCRIPT_DIR (the repo root)
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+USER_HOME="/home/$NEW_USER"
+
+# Copy the entire repo structure to user's home, preserving structure
+echo "Copying repository files from $REPO_ROOT to $USER_HOME..."
+# Use rsync if available, otherwise cp
+if command -v rsync &> /dev/null; then
+    rsync -av --exclude='.git' "$REPO_ROOT/" "$USER_HOME/"
+else
+    cp -r "$REPO_ROOT/." "$USER_HOME/"
+fi
+
+# Fix ownership
+chown -R "$NEW_USER:$NEW_USER" "$USER_HOME"
+echo "Repository copied successfully!"
+echo ""
+
 # Step 4: Configure pacman
 echo "Step 4: Configuring pacman..."
 echo "--------------------------------"

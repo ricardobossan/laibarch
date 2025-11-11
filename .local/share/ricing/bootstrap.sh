@@ -1,30 +1,39 @@
 #!/bin/bash
 # Simple bootstrap for fresh Arch install
-# Run from: ~/source/repos/laibarch-deprecated/scripts/bootstrap.sh
+set -e  # Exit on error
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # Build and install dwl and slstatus from patched source
 echo "Building and installing slstatus..."
-sudo make -C ${HOME}/.local/src/slstatus/ clean install
-echo "Building and installing dwl..."
-sudo make -C ${HOME}/.local/src/dwl/ clean install
-echo "dwl and slstatus installed successfully!"
+if [ -d "${HOME}/.local/src/slstatus" ]; then
+    sudo make -C ${HOME}/.local/src/slstatus/ clean install
+    echo "slstatus installed successfully!"
+else
+    echo "WARNING: slstatus source not found at ${HOME}/.local/src/slstatus/"
+    echo "Skipping slstatus installation."
+fi
 
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+echo "Building and installing dwl..."
+if [ -d "${HOME}/.local/src/dwl" ]; then
+    sudo make -C ${HOME}/.local/src/dwl/ clean install
+    echo "dwl installed successfully!"
+else
+    echo "WARNING: dwl source not found at ${HOME}/.local/src/dwl/"
+    echo "Skipping dwl installation."
+fi
 
 # Install dwl status click handler
 echo "Installing status bar click handler..."
 mkdir -p ${HOME}/.local/bin
-cp "$REPO_ROOT/ricing/dwl-status-click.sh" ${HOME}/.local/bin/
+cp "$SCRIPT_DIR/dwl-status-click.sh" ${HOME}/.local/bin/
 chmod +x ${HOME}/.local/bin/dwl-status-click.sh
 echo "Click handler installed successfully!"
-
-# Install yay, brave, neovim
-bash "$REPO_ROOT/ricing/programs-scripts.sh"
 
 # Install everything from programs.txt with pacman
 echo "Installing packages from programs.txt..."
 # Clean the file: remove empty lines and whitespace, then install all at once
-grep -v '^[[:space:]]*$' "$REPO_ROOT/ricing/programs.txt" | xargs sudo pacman -S --needed --noconfirm
+grep -v '^[[:space:]]*$' "$SCRIPT_DIR/programs.txt" | xargs sudo pacman -S --needed --noconfirm
 echo "Package installation complete!"
 
 # Stow system configs
