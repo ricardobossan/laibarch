@@ -22,6 +22,7 @@
 !.local/bin/dwl-autostart.sh
 !/.local/bin/dwl-status-click.sh
 !/.local/bin/screenshot.sh
+!/.local/bin/reddit-wallpaper.sh
 !.local/src/
 !.local/src/dwl
 !.local/src/dwl/**/*

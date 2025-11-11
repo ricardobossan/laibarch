@@ -14,7 +14,8 @@ wl-clip-persist --clipboard both &
 
 swww-daemon --no-cache &
 
-swww img ~/laibarch.png --resize fit
+# Set wallpaper from Reddit
+~/.local/bin/reddit-wallpaper.sh
 
 # Auto-adjust color temperature based on time of day
 gammastep -l geoclue2 -t 6500:2600 &
