@@ -68,3 +68,4 @@ python-pip
 python-pipx
 ksnip
 translate-shell
+zathura-pdf-mupdf
