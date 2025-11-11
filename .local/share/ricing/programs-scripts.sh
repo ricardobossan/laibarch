@@ -21,14 +21,14 @@ sudo npm install -g tree-sitter-cli
 REPOS=${HOME}/source/repos
 
 # transmission
-$ git clone --recurse-submodules https://github.com/transmission/transmission Transmission
-$ cd Transmission
+git clone --recurse-submodules https://github.com/transmission/transmission Transmission
+cd Transmission
 # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary with debug information. (preferred)
 # Use -DCMAKE_BUILD_TYPE=Release to build full optimized binary.
-$ cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
-$ cd build
-$ cmake --build .
-$ sudo cmake --install .
+cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cd build
+cmake --build .
+sudo cmake --install .
 
 # tremc
 TREMC_DIR=${REPOS}/tremc
