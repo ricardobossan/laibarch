@@ -7,6 +7,11 @@
 !.config/nvim/
 !.config/nvim/**/*
 .config/nvim/spell/*
+!.config/mimeapps.list
+!.config/alacritty/
+!.config/alacritty/alacritty.toml
+!.config/tmux
+!.config/tmux/tmux.conf
 !.local
 !.local/share/
 !.local/share/bg
@@ -25,3 +30,4 @@
 !.local/src/slstatus/**/*
 .local/src/slstatus/config.h
 !README.md
+**/.claude
