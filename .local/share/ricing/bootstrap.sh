@@ -43,6 +43,10 @@ sudo systemctl enable --now reflector && echo "  ✓ reflector"
 
 # Location services for gammastep
 if systemctl list-unit-files | grep -q '^geoclue.service'; then
+    # Install geoclue config with gammastep permissions
+    if [ -f "$HOME/system-config/etc/geoclue/geoclue.conf" ]; then
+        sudo cp "$HOME/system-config/etc/geoclue/geoclue.conf" /etc/geoclue/geoclue.conf && echo "  ✓ geoclue config installed"
+    fi
     sudo systemctl enable --now geoclue && echo "  ✓ geoclue"
 fi
 

@@ -16,6 +16,7 @@
 !.local/share/
 !.local/share/laibarch.png
 !.local/share/ricing
+!.local/share/ricing/**
 !.local/share/ricing/**/*
 !.local/bin/
 !.local/bin/configure-displays.sh
@@ -25,10 +26,14 @@
 !/.local/bin/reddit-wallpaper.sh
 !.local/src/
 !.local/src/dwl
+!.local/src/dwl/**
 !.local/src/dwl/**/*
 .local/src/dwl/config.h
 !.local/src/slstatus
+!.local/src/slstatus/**
 !.local/src/slstatus/**/*
 .local/src/slstatus/config.h
+!system-config
+!system-config/**/*
 !README.md
 **/.claude
