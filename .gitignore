@@ -34,6 +34,7 @@
 !.local/src/slstatus/**/*
 .local/src/slstatus/config.h
 !system-config
+!system-config/**
 !system-config/**/*
 !README.md
 **/.claude
