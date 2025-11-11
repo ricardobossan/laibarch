@@ -4,6 +4,7 @@
 WALLPAPER_DIR="$HOME/.local/share/wallpapers/reddit"
 CACHE_FILE="$HOME/.cache/reddit_wallpaper.jpg"
 LOG_FILE="$HOME/.cache/reddit_wallpaper.log"
+DEFAULT_WALLPAPER="$HOME/.local/share/laibarch.png"
 
 # Create wallpaper directory if it doesn't exist
 mkdir -p "$WALLPAPER_DIR"
@@ -21,7 +22,8 @@ JSON=$(curl -s -A "linux:earthporn-wallpaper:v1.0 (by /u/wallpaper_script)" \
     "https://www.reddit.com/r/earthporn/top.json?limit=50&t=week")
 
 if [ -z "$JSON" ]; then
-    log "ERROR: Failed to fetch data from Reddit"
+    log "ERROR: Failed to fetch data from Reddit, using default wallpaper"
+    swww img "$DEFAULT_WALLPAPER" --resize fit 2>/dev/null
     exit 1
 fi
 
@@ -30,7 +32,8 @@ fi
 URLS=$(echo "$JSON" | jq -r '.data.children[].data | select(.post_hint == "image") | .url' | grep -E '\.(jpg|png)$|i\.redd\.it')
 
 if [ -z "$URLS" ]; then
-    log "ERROR: No image URLs found"
+    log "ERROR: No image URLs found, using default wallpaper"
+    swww img "$DEFAULT_WALLPAPER" --resize fit 2>/dev/null
     exit 1
 fi
 
@@ -54,7 +57,8 @@ if wget -q -O "$CACHE_FILE" "$RANDOM_URL"; then
         log "WARNING: swww not found, wallpaper downloaded but not set"
     fi
 else
-    log "ERROR: Failed to download wallpaper from $RANDOM_URL"
+    log "ERROR: Failed to download wallpaper from $RANDOM_URL, using default wallpaper"
+    swww img "$DEFAULT_WALLPAPER" --resize fit 2>/dev/null
     exit 1
 fi
 
