@@ -58,7 +58,7 @@ alias \
 alias \
   cfb="\$EDITOR ${HOME}/.bashrc" \
   ric="cd ${HOME}/Documents/ricardo && ${EDITOR} vault-root.md +ObsidianToday" \
-  ether="cd ${HOME}/Documents/mai/ether && ${EDITOR} ." \
+  ether="cd ${HOME}/Documents/mai/ether && ${EDITOR} ether\ \(todos\).md" \
   bys="cd ${HOME}/Documents/bys && ${EDITOR} ." \
   docs="cd ${HOME}/Documents/zettelkasten && ${EDITOR} ." \
   cf="cd ${HOME}/.config" \
