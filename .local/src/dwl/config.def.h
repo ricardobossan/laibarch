@@ -170,9 +170,11 @@ static const Key keys[] = {
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_less,       tagmon,         {.i = WLR_DIRECTION_LEFT} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_greater,    tagmon,         {.i = WLR_DIRECTION_RIGHT} },
   /* Screenshot keybindings */
-  { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_S,          spawn,          SHCMD("sh -c 'slurp | grim -g - ~/Documents/Pictures/screenshots/screenshot_$(date +%Y%m%d_%H%M%S).png && notify-send \"Screenshot\" \"Selection saved\"'") },
+  /* Selection to screenshot file + clipboard */
+  { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_S, spawn, SHCMD("sh -c 'outfile=~/Documents/Pictures/screenshots/screenshot_$(date +%Y%m%d_%H%M%S).png; slurp | grim -g - - | tee \"$outfile\" | wl-copy && notify-send \"Screenshot\" \"Selection saved and copied\"'") },
+  /* Fullscreen to screenshot file */
   { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_P,          spawn,          SHCMD("sh -c 'grim ~/Documents/Pictures/screenshots/screenshot_$(date +%Y%m%d_%H%M%S).png && notify-send \"Screenshot\" \"Fullscreen saved\"'") },
-  { MODKEY                   , XKB_KEY_w,          spawn,          SHCMD("brave") },
+  { MODKEY                   , XKB_KEY_w,          spawn,          SHCMD("brave") }
 	{ MODKEY,                    XKB_KEY_equal,      spawn,          {.v = volup} },
 	{ MODKEY,                    XKB_KEY_minus,      spawn,          {.v = voldown} },
 	TAGKEYS(          XKB_KEY_1, XKB_KEY_exclam,                     0),
