@@ -4,10 +4,27 @@ set -e  # Exit on error
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
+# Install everything from programs.txt with pacman FIRST (needed for building dwl/slstatus)
+echo "Installing packages from programs.txt..."
+# Clean the file: remove empty lines and whitespace, then install all at once
+grep -v '^[[:space:]]*$' "$SCRIPT_DIR/../programs.txt" | xargs sudo pacman -S --needed --noconfirm
+echo "Package installation complete!"
+echo ""
+
 # Build and install dwl and slstatus from patched source
+# TODO: Replace slstatus (X11) with dwlb (Wayland-native): https://github.com/kolunmi/dwlb
+
+# Ensure /usr/local directory structure exists
+sudo mkdir -p /usr/local/bin
+sudo mkdir -p /usr/local/share/man/man1
+
 echo "Building and installing slstatus..."
 if [ -d "${HOME}/.local/src/slstatus" ]; then
-    sudo make -C ${HOME}/.local/src/slstatus/ clean install
+    (
+        cd "${HOME}/.local/src/slstatus"
+        [ -f config.h ] && yes|rm config.h
+        sudo make install
+    )
     echo "slstatus installed successfully!"
 else
     echo "WARNING: slstatus source not found at ${HOME}/.local/src/slstatus/"
@@ -16,7 +33,11 @@ fi
 
 echo "Building and installing dwl..."
 if [ -d "${HOME}/.local/src/dwl" ]; then
-    sudo make -C ${HOME}/.local/src/dwl/ clean install
+    (
+        cd "${HOME}/.local/src/dwl"
+        [ -f config.h ] && yes|rm config.h
+        sudo make install
+    )
     echo "dwl installed successfully!"
 else
     echo "WARNING: dwl source not found at ${HOME}/.local/src/dwl/"
@@ -26,15 +47,9 @@ fi
 # Install dwl status click handler
 echo "Installing status bar click handler..."
 mkdir -p ${HOME}/.local/bin
-cp "$SCRIPT_DIR/dwl-status-click.sh" ${HOME}/.local/bin/
+cp "$SCRIPT_DIR/../dwl-status-click.sh" ${HOME}/.local/bin/
 chmod +x ${HOME}/.local/bin/dwl-status-click.sh
 echo "Click handler installed successfully!"
-
-# Install everything from programs.txt with pacman
-echo "Installing packages from programs.txt..."
-# Clean the file: remove empty lines and whitespace, then install all at once
-grep -v '^[[:space:]]*$' "$SCRIPT_DIR/programs.txt" | xargs sudo pacman -S --needed --noconfirm
-echo "Package installation complete!"
 
 # Stow system configs
 #cd "$REPO_ROOT/root" && sudo stow -t / .
@@ -46,6 +61,7 @@ echo "Enabling and starting system services..."
 # Network services
 sudo systemctl enable --now NetworkManager && echo "  ✓ NetworkManager"
 sudo systemctl enable --now systemd-resolved && echo "  ✓ systemd-resolved"
+sudo systemctl enable --now iwd && echo "  ✓ iwd"
 
 # Mirror list updater
 sudo systemctl enable --now reflector && echo "  ✓ reflector"

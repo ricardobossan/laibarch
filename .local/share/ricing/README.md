@@ -1,41 +1,136 @@
-# Rice Configuration
+# Laibarch Installation Scripts
 
-Automated setup for DWL Wayland compositor with slstatus bar on Arch Linux.
+Complete automated Arch Linux installation with DWL Wayland compositor, LUKS encryption, and iwd networking.
 
-## Prerequisites
+## Installation Workflow
 
-- Basic Arch Linux installation completed
-- System partitioned, formatted, and bootloader installed
-- System booted into the installation
-- This repository cloned or copied to the user's home directory
-  - Contains patched dwl and slstatus sources at `~/.local/src/`
-
-## Section 1: Standard Setup
-
-For systems where **user**, **internet**, and **pacman** are already configured.
-
-### Quick Start
+### Step 1: Create Repository ISO
 
 ```bash
-bash run-section1.sh
+bash create-repo-iso.sh
 ```
 
-### What It Does
+Creates `laibarch-repo.iso` containing the entire repository.
 
-1. **`bootstrap.sh`** - Builds DWL/slstatus, installs system packages, enables services
-2. **`programs-scripts.sh`** - Installs additional software from source
+### Step 2: Phase 1 - Base Installation (from Arch Live ISO)
 
-### Installed Packages
+Boot from official Arch ISO, attach `laibarch-repo.iso` as second CD-ROM (or USB), then:
 
-**System packages** (from `programs.txt`):
-- Terminal: `alacritty`, `foot`
-- Shell: `stow`, `bat`, `fd`, `ripgrep`, `htop`, `tmux`
-- Development: `git`, `github-cli`, `rust`, `nodejs`, `npm`, `cmake`, `base-devel`, `pkg-config`
-- Wayland: `wlroots`, `wayland-protocols`, `wl-clipboard`, `cliphist`, `wmenu`, `swww`
-- Utilities: `mako`, `grim`, `slurp`, `gammastep`, `geoclue`
-- Applications: `mpv`, `mupdf`, `zathura`, `yazi`, `calcurse`, `obsidian`, `syncthing`
+```bash
+# Mount repository
+mkdir /mnt/repo
+mount /dev/sr0 /mnt/repo  # or sr1 (check with lsblk), or /dev/sdX for USB
 
-**From source**:
+# Run installation script
+bash /mnt/repo/.local/share/ricing/laibarch-install.sh
+```
+
+**The script auto-detects you're on live ISO and runs Phase 1:**
+- Sets up WiFi if needed (using iwctl)
+- Auto-detects disk (VM/NVMe/SATA)
+- Partitions disk (1GB EFI boot + encrypted root)
+- Sets up LUKS encryption
+- Installs base system with iwd, NetworkManager, cryptsetup
+- Configures NetworkManager to use iwd backend
+- Configures systemd-boot bootloader
+- Prompts for timezone, locale, hostname, root password
+
+### Step 3: Phase 2 - Post-Installation (after first boot)
+
+Reboot, unlock disk encryption, login as root, then:
+
+```bash
+# Mount repository again
+mount /dev/sr0 /mnt/repo  # or sr1, check with lsblk
+
+# Run SAME script - it detects Phase 2
+bash /mnt/repo/.local/share/ricing/laibarch-install.sh
+```
+
+**The script auto-detects you're on installed system and runs Phase 2:**
+- Creates user account with sudo privileges
+- Copies repository to user's home directory
+- Configures pacman (keyring, parallel downloads)
+- Installs all packages and builds DWL/slstatus
+
+### Step 4: Complete
+
+Reboot and DWL starts automatically.
+
+---
+
+## File Structure
+
+```
+.local/share/ricing/
+├── laibarch-install.sh          # Main: Post-installation (run after boot)
+├── create-repo-iso.sh            # Helper: Build repository ISO
+├── programs.txt                  # Package list for pacman
+├── dwl-status-click.sh           # Status bar click handler
+├── scripts/
+│   ├── encrypted-arch-install.sh # Main: Base installation (from live ISO)
+│   ├── chroot-configure.sh       # System configuration (run in chroot)
+│   ├── bootstrap.sh              # Build DWL/slstatus, install packages
+│   ├── programs-scripts.sh       # Install programs from source
+│   └── configure-pacman.sh       # Initialize pacman keyring
+└── README.md                     # This file
+```
+
+---
+
+## Individual Scripts
+
+### `scripts/encrypted-arch-install.sh`
+
+**Run from**: Arch Live ISO (before installation)
+
+Base system installation with LUKS encryption, partitioning, calls chroot-configure.sh.
+
+### `scripts/chroot-configure.sh`
+
+**Run by**: encrypted-arch-install.sh (inside chroot)
+
+Configures timezone, locale, hostname, root password, sudoers, mkinitcpio, NetworkManager→iwd, systemd-boot.
+
+### `laibarch-install.sh`
+
+**Run from**: First boot as root (after encrypted-arch-install.sh)
+
+User creation, package installation, DWL build.
+
+### `scripts/bootstrap.sh`
+
+**Run by**: laibarch-install.sh (automatically)
+
+Builds DWL/slstatus from source, installs all packages from programs.txt, enables system services.
+
+### `scripts/programs-scripts.sh`
+
+**Run by**: laibarch-install.sh (automatically)
+
+Downloads and builds additional software from source (neovim, brave, etc.).
+
+### `scripts/configure-pacman.sh`
+
+**Run by**: laibarch-install.sh (automatically)
+
+Initializes pacman keyring, enables parallel downloads.
+
+---
+
+## Installed Packages
+
+**System** (from programs.txt):
+- Terminals: alacritty, foot
+- Shell tools: bat, fd, ripgrep, htop, tmux, stow
+- Development: git, github-cli, rust, nodejs, npm, cmake, base-devel
+- Wayland: wlroots, wayland-protocols, wl-clipboard, cliphist, wmenu, swww
+- X11 (temporary): libx11, libxft (required for slstatus - will migrate to dwlb)
+- Utilities: mako, grim, slurp, gammastep, geoclue
+- Applications: mpv, mupdf, zathura, yazi, calcurse, obsidian, syncthing
+- **iwd**: Network backend (explicitly enabled)
+
+**From source** (programs-scripts.sh):
 - neovim (v0.10.4)
 - transmission + tremc
 - brave-browser
@@ -43,147 +138,58 @@ bash run-section1.sh
 - workstyle
 
 **Services enabled**:
-- System: `NetworkManager`, `systemd-resolved`, `reflector`, `geoclue`, `fstrim.timer`
-- User: `pipewire`, `pipewire-pulse`, `wireplumber`, `syncthing`
+- System: NetworkManager, systemd-resolved, iwd, reflector, geoclue, fstrim.timer
+- User: pipewire, pipewire-pulse, wireplumber, syncthing
 
 ---
 
-## Section 2: Complete Fresh Install
+## VM vs Physical Hardware
 
-For fresh Arch installations requiring full setup from a **pendrive** (no internet configured yet).
+### For VMs (libvirt/QEMU)
 
-### Quick Start
+**ISO attachment** (recommended):
+```xml
+<disk type="file" device="cdrom">
+  <source file="/path/to/laibarch-repo.iso"/>
+  <target dev="sr0" bus="sata"/>
+  <readonly/>
+</disk>
+```
 
+Device naming: `/dev/vda` (auto-detected)
+
+### For Physical Hardware
+
+**USB preparation**:
 ```bash
-# Run as root from pendrive
-sudo bash run-section2.sh
+# Option 1: Copy repository to USB
+cp -r /path/to/laibarch /media/usb/
+
+# Option 2: Burn ISO to CD/DVD
 ```
 
-### What It Does
-
-The script will prompt you interactively for:
-1. Root password
-2. New username
-3. New user password
-4. WiFi SSID
-5. WiFi password
-
-Then automatically:
-1. Configures sudo for wheel group
-2. Creates new user with sudo privileges
-3. Initializes pacman keyring and enables parallel downloads
-4. Runs Section 1 installation (downloads and installs all packages)
-5. Switches NetworkManager to use iwd backend
-6. Reconnects to WiFi automatically
-
-### Execution Flow
-
-```
-run-section2.sh (as root from pendrive):
-  ├─> Configure root password (interactive)
-  ├─> Configure sudo/wheel group
-  ├─> Create user (interactive)
-  ├─> Copy repository from pendrive to user home directory
-  ├─> configure-pacman.sh (initialize keyring, enable parallel downloads)
-  ├─> Get WiFi credentials (interactive, for reconnection)
-  ├─> run-section1.sh (as new user)
-  │     ├─> bootstrap.sh (build dwl/slstatus, install packages, enable services)
-  │     └─> programs-scripts.sh (install from source)
-  ├─> configure-network.sh (switch to iwd backend - disconnects temporarily)
-  └─> Reconnect WiFi using saved credentials
-```
+Device naming: `/dev/nvme0n1` (NVMe) or `/dev/sda` (SATA) - auto-detected
 
 ---
-
-## Individual Scripts
-
-If you need to run specific parts manually:
-
-### `configure-pacman.sh`
-```bash
-sudo bash configure-pacman.sh
-```
-Initializes pacman keyring, updates packages, enables parallel downloads.
-
-### `configure-network.sh`
-```bash
-sudo bash configure-network.sh
-```
-Switches NetworkManager to use iwd instead of wpa_supplicant.
-
-**Note**: This restarts NetworkManager and temporarily disconnects network. Reconnect with:
-```bash
-nmcli device wifi connect "SSID" password "PASSWORD"
-```
-
-### `bootstrap.sh`
-```bash
-bash bootstrap.sh
-```
-Builds and installs DWL/slstatus, installs system packages, enables services.
-
-### `programs-scripts.sh`
-```bash
-bash programs-scripts.sh
-```
-Downloads and builds software from source.
-
----
-
-## Post-Installation
-
-Reboot to start DWL:
-```bash
-reboot
-```
-
----
-
-## File Structure
-
-```
-~ (home directory)
-├── .local/
-│   ├── src/
-│   │   ├── dwl/              # Patched dwl source (part of repo)
-│   │   └── slstatus/         # Patched slstatus source (part of repo)
-│   └── share/
-│       └── ricing/           # This directory
-│           ├── run-section1.sh           # Master: Standard setup
-│           ├── run-section2.sh           # Master: Complete fresh install
-│           ├── bootstrap.sh              # Build DWL/slstatus, install packages
-│           ├── programs-scripts.sh       # Build programs from source
-│           ├── configure-pacman.sh       # Initialize pacman keyring
-│           ├── configure-network.sh      # NetworkManager + iwd setup
-│           ├── programs.txt              # Pacman package list
-│           └── dwl-status-click.sh       # Status bar click handler
-```
-
-## Repository Setup
-
-### For Section 1 (existing system):
-```bash
-# Clone repo to home directory
-cd ~
-git clone <repo-url> .
-```
-
-### For Section 2 (fresh install from pendrive):
-1. Clone/copy this repository to a pendrive
-2. Boot fresh Arch install
-3. Mount pendrive and navigate to the scripts directory:
-   ```bash
-   mount /dev/sdX1 /mnt  # Replace sdX1 with your pendrive
-   cd /mnt/.local/share/ricing
-   sudo bash run-section2.sh
-   ```
-4. The script will automatically copy the repository to the new user's home
 
 ## Notes
 
-- Repo includes patched dwl/slstatus sources at `~/.local/src/`
-- All scripts use relative paths (pendrive-safe)
-- `run-section2.sh` must be run as root
-- `run-section1.sh` runs as regular user
-- WiFi credentials used only for reconnection (not stored)
-- External programs cloned to `~/source/repos/`
+- **LUKS encryption**: Password required on every boot (set during Phase 1)
+- **Auto-login**: Not included (add in private configurations if desired)
+- **iwd backend**: Configured during base installation; NetworkManager uses iwd from first boot
+- **WiFi setup**: Phase 1 handles WiFi connection for live ISO; your credentials persist after install
+- **Device detection**: Scripts auto-detect VM/NVMe/SATA disks
+- **Patched sources**: DWL/slstatus at `~/.local/src/`
+- **Repository copy**: Entire repo copied to user's home during Phase 2
+- **External programs**: Cloned to `~/source/repos/`
+
+---
+
+## Security
+
+- All scripts prompt for confirmation before destructive operations
+- No hardcoded passwords or sensitive data
+- Timezone/hostname prompted during installation
+- LUKS encryption with user-chosen strong password
+- Auto-login intentionally excluded
+- Designed for safe public sharing

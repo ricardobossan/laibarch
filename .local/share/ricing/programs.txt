@@ -1,3 +1,4 @@
+iwd
 stow
 alacritty
 bat
@@ -40,9 +41,12 @@ noto-fonts
 wayland
 wayland-protocols
 wlroots0.19
-fcft 
+fcft
 tllist
+pkgconf
 wl-clipboard
+libx11
+libxft
 cliphist
 wl-clip-persist
 otf-font-awesome
