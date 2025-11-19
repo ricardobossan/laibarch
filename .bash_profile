@@ -23,5 +23,7 @@ fi
 
 # Executes dwl on start with automatic display configuration
 if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
-  slstatus -s | exec dwl -s ~/.local/bin/dwl-autostart.sh
+  echo "$(date): Starting dwl" >> /tmp/dwl-debug.log
+  slstatus -s | dwl -s ~/.local/bin/dwl-autostart.sh
+  echo "$(date): dwl exited with code $?" >> /tmp/dwl-debug.log
 fi

@@ -52,7 +52,8 @@ alias \
   obsidian="obsidian --enable-features=UseOzonePlatform --ozone-platform=wayland" \
   calcurse="calcurse -D ${HOME}/Documents/calcurse" \
   fd="fd -iH" \
-  rg="rg -iH"
+  rg="rg -iH" \
+  suspend="systemctl suspend"
 
 # Shortcuts
 alias \
