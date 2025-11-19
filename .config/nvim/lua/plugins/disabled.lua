@@ -1,5 +1,4 @@
 return {
-  --[[ AI
   {
     "Exafunction/codeium.nvim",
     enabled = false,
@@ -16,5 +15,4 @@ return {
     "saghen/blink.cmp",
     enabled = false,
   },
-  --]]
 }
