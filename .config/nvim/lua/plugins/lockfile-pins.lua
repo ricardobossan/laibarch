@@ -14,7 +14,6 @@ return {
   { "akinsho/bufferline.nvim", commit = "655133c3b4c3e5e05ec549b9f8cc2894ac6f51b3" },
   { "catppuccin/nvim", name = "catppuccin", commit = "5b5e3aef9ad7af84f463d17b5479f06b87d5c429" },
   { "stevearc/conform.nvim", commit = "b1a75324ddf96b7bb84963a297b1ed334db087c0" },
-  { "zbirenbaum/copilot.lua", commit = "d661d65b4cab20a5c164f6d9081d91ed324fe4d8" },
   { "dgagn/diagflow.nvim", commit = "b13321b517ff64bf42eeac2214085d3c76d83a0d" },
   { "GustavEikaas/easy-dotnet.nvim", commit = "86de4c79c65c4ce17a1a95fd05065290397e7c15" },
   { "folke/flash.nvim", commit = "3c942666f115e2811e959eabbdd361a025db8b63" },

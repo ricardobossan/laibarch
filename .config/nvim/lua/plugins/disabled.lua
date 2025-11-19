@@ -1,18 +1,18 @@
 return {
   {
     "Exafunction/codeium.nvim",
-    enabled = false,
+    enabled = true,
   },
   {
     "zbirenbaum/copilot.lua",
-    enabled = false,
+    enabled = true,
   },
   {
     "tzachar/cmp-tabnine",
-    enabled = false,
+    enabled = true,
   },
   {
     "saghen/blink.cmp",
-    enabled = false,
+    enabled = true,
   },
 }
