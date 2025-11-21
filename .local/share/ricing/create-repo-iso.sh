@@ -92,15 +92,15 @@ Complete installation workflow:
 
 1. Boot from official Arch ISO
 2. Attach this ISO as second CD-ROM (VMs) or USB (physical)
-3. Mount repository:
-   mkdir /mnt/repo && mount /dev/sr1 /mnt/repo  # check device with lsblk
+3. Mount repository (use /repo, NOT under /mnt):
+   mkdir /repo && mount /dev/sr1 /repo  # check device with lsblk
 
 4. Run installation (Phase 1 - auto-detected):
-   bash /mnt/repo/.local/share/ricing/laibarch-install.sh
+   bash /repo/.local/share/ricing/laibarch-install.sh
 
 5. Reboot, login as root, mount repo again:
-   mount /dev/sr0 /mnt/repo
-   bash /mnt/repo/.local/share/ricing/laibarch-install.sh  # Phase 2
+   mount /dev/sr0 /repo
+   bash /repo/.local/share/ricing/laibarch-install.sh  # Phase 2
 
 6. Reboot - DWL starts automatically
 
