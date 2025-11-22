@@ -137,6 +137,8 @@ static const char *clipmenu[] = { "/bin/sh", "-c",
   NULL };
 static const char *volup[]   = { "wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%+", NULL };
 static const char *voldown[] = { "wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%-", NULL };
+static const char *briup[]   = { "brightnessctl", "set", "5%+", NULL };
+static const char *bridown[] = { "brightnessctl", "set", "5%-", NULL };
 
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
@@ -177,6 +179,8 @@ static const Key keys[] = {
   { MODKEY                   , XKB_KEY_w,          spawn,          SHCMD("brave") },
 	{ MODKEY,                    XKB_KEY_equal,      spawn,          {.v = volup} },
 	{ MODKEY,                    XKB_KEY_minus,      spawn,          {.v = voldown} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_plus,       spawn,          {.v = briup} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_underscore, spawn,          {.v = bridown} },
 	TAGKEYS(          XKB_KEY_1, XKB_KEY_exclam,                     0),
 	TAGKEYS(          XKB_KEY_2, XKB_KEY_at,                         1),
 	TAGKEYS(          XKB_KEY_3, XKB_KEY_numbersign,                 2),
