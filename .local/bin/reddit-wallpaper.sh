@@ -9,6 +9,19 @@ DEFAULT_WALLPAPER="$HOME/.local/share/laibarch.png"
 # Create wallpaper directory if it doesn't exist
 mkdir -p "$WALLPAPER_DIR"
 
+# Check for 'default' argument to apply default wallpaper
+if [ "$1" = "default" ]; then
+    echo "Applying default wallpaper..."
+    if command -v swww &> /dev/null; then
+        swww img "$DEFAULT_WALLPAPER" --resize fit --transition-type fade --transition-duration 2
+        echo "Default wallpaper set successfully"
+    else
+        echo "ERROR: swww not found"
+        exit 1
+    fi
+    exit 0
+fi
+
 # Function to log messages
 log() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$LOG_FILE"
