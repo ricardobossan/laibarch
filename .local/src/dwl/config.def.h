@@ -66,6 +66,14 @@ static const struct xkb_rule_names xkb_rules = {
 	/* example:
 	.options = "ctrl:nocaps",
 	*/
+	/* All fields must be explicitly set to NULL when using .options (e.g. caps:super).
+	 * Without explicit NULLs, uninitialized fields contain garbage pointers that cause
+	 * xkb_keymap_new_from_names() to fail, crashing dwl with "failed to compile keymap".
+	 * The crash only manifests when .options is set because xkb then processes all fields. */
+	.rules = NULL,
+	.model = NULL,
+	.layout = NULL,
+	.variant = NULL,
 	.options = "caps:super",
 };
 
