@@ -69,6 +69,8 @@ syncthing
 wlr-randr
 fastfetch
 tmux
+zsh
+zsh-completions
 obsidian
 obsidian-icon-theme
 gammastep

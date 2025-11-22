@@ -12,6 +12,11 @@
 !.config/alacritty/alacritty.toml
 !.config/tmux
 !.config/tmux/tmux.conf
+!.config/zsh/
+!.config/zsh/.zshrc
+.config/zsh/.zhistory
+!.zshenv
+!.gitmodules
 !.local
 !.local/share/
 !.local/share/laibarch.png

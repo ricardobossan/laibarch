@@ -40,6 +40,13 @@ echo "Using ISO creation tool: $ISO_CMD"
 echo "Repository root: $REPO_ROOT"
 echo ""
 
+# Ensure git submodules are initialized (plugins, etc.)
+if [ -f "$REPO_ROOT/.gitmodules" ]; then
+    echo "Initializing git submodules..."
+    git -C "$REPO_ROOT" submodule update --init --recursive
+    echo ""
+fi
+
 # Allow custom output location
 read -p "Output directory [$OUTPUT_DIR]: " CUSTOM_OUTPUT_DIR
 if [ -n "$CUSTOM_OUTPUT_DIR" ]; then

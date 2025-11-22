@@ -40,3 +40,7 @@ Reboot and DWL starts.
 - **Automated** from bare metal to working system
 
 Tested on VMs and hardware.
+
+## Documentation
+
+For detailed documentation see `.local/share/ricing/README.md`

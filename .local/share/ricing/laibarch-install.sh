@@ -250,6 +250,10 @@ echo "--------------------------------"
 echo "Running bootstrap..."
 sudo -u "$NEW_USER" HOME="/home/$NEW_USER" bash "$SCRIPT_DIR/scripts/bootstrap.sh"
 
+# Change user's default shell to zsh (now that it's installed)
+echo "Setting zsh as default shell for $NEW_USER..."
+chsh -s /bin/zsh "$NEW_USER"
+
 # Run programs-scripts as the new user (with proper HOME)
 echo "Installing additional programs from source..."
 sudo -u "$NEW_USER" HOME="/home/$NEW_USER" bash "$SCRIPT_DIR/scripts/programs-scripts.sh"

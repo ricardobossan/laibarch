@@ -26,12 +26,13 @@ bash /mnt/repo/.local/share/ricing/laibarch-install.sh
 ```
 
 **The script auto-detects you're on live ISO and runs Phase 1:**
+
 - Sets up WiFi if needed (using iwctl)
 - Auto-detects disk (VM/NVMe/SATA)
 - Partitions disk (1GB EFI boot + encrypted root)
 - Sets up LUKS encryption
 - Installs base system with iwd, NetworkManager, cryptsetup
-- Configures NetworkManager to use iwd backend
+- Configures NetworkManager to use iwd backend (NetworkManager->iwd)
 - Configures systemd-boot bootloader
 - Prompts for timezone, locale, hostname, root password
 
@@ -48,6 +49,7 @@ bash /mnt/repo/.local/share/ricing/laibarch-install.sh
 ```
 
 **The script auto-detects you're on installed system and runs Phase 2:**
+
 - Creates user account with sudo privileges
 - Copies repository to user's home directory
 - Configures pacman (keyring, parallel downloads)
@@ -90,7 +92,7 @@ Base system installation with LUKS encryption, partitioning, calls chroot-config
 
 **Run by**: encrypted-arch-install.sh (inside chroot)
 
-Configures timezone, locale, hostname, root password, sudoers, mkinitcpio, NetworkManager→iwd, systemd-boot.
+Configures timezone, locale, hostname, root password, sudoers, mkinitcpio, NetworkManager->iwd, systemd-boot.
 
 ### `laibarch-install.sh`
 
@@ -121,8 +123,9 @@ Initializes pacman keyring, enables parallel downloads.
 ## Installed Packages
 
 **System** (from programs.txt):
+
 - Terminals: alacritty, foot
-- Shell tools: bat, fd, ripgrep, htop, tmux, stow
+- Shell tools: zsh, zsh-completions, bat, fd, ripgrep, htop, tmux, stow
 - Development: git, github-cli, rust, nodejs, npm, cmake, base-devel
 - Wayland: wlroots, wayland-protocols, wl-clipboard, cliphist, wmenu, swww
 - X11 (temporary): libx11, libxft (required for slstatus - will migrate to dwlb)
@@ -131,6 +134,7 @@ Initializes pacman keyring, enables parallel downloads.
 - **iwd**: Network backend (explicitly enabled)
 
 **From source** (programs-scripts.sh):
+
 - neovim (v0.10.4)
 - transmission + tremc
 - brave-browser
@@ -138,6 +142,7 @@ Initializes pacman keyring, enables parallel downloads.
 - workstyle
 
 **Services enabled**:
+
 - System: NetworkManager, systemd-resolved, iwd, reflector, geoclue, fstrim.timer
 - User: pipewire, pipewire-pulse, wireplumber, syncthing
 
@@ -148,6 +153,7 @@ Initializes pacman keyring, enables parallel downloads.
 ### For VMs (libvirt/QEMU)
 
 **ISO attachment** (recommended):
+
 ```xml
 <disk type="file" device="cdrom">
   <source file="/path/to/laibarch-repo.iso"/>
@@ -161,6 +167,7 @@ Device naming: `/dev/vda` (auto-detected)
 ### For Physical Hardware
 
 **USB preparation**:
+
 ```bash
 # Option 1: Copy repository to USB
 cp -r /path/to/laibarch /media/usb/
@@ -182,6 +189,68 @@ Device naming: `/dev/nvme0n1` (NVMe) or `/dev/sda` (SATA) - auto-detected
 - **Patched sources**: DWL/slstatus at `~/.local/src/`
 - **Repository copy**: Entire repo copied to user's home during Phase 2
 - **External programs**: Cloned to `~/source/repos/`
+
+---
+
+## Terminal Stack
+
+The terminal stack follows the standard architecture: `Kernel -> DWL -> Alacritty -> Tmux -> Shell`
+
+### Components
+
+**Alacritty** (`~/.config/alacritty/alacritty.toml`)
+- Terminal emulator (creates PTY, renders text)
+- Minimal config: font size 8.5, 85% opacity, clipboard bindings
+
+**Tmux** (`~/.config/tmux/tmux.conf`)
+- Terminal multiplexer (sessions, panes)
+- Prefix: `Ctrl+e` (default `Ctrl+b` unbound)
+- Vim-style pane navigation: `hjkl`
+- Vi mode for copy: `set -g mode-keys vi`
+- Plugins via TPM: resurrect, continuum, sessionx, floax, catppuccin theme
+- Auto-restore sessions on start
+
+**Shell** (Zsh, with Bash available)
+- Zsh is the default login shell (set via `chsh` during installation)
+- Auto-starts tmux when in terminal emulator (checks for `/dev/pts/*`)
+- Vim mode with cursor shape change (block for normal, beam for insert)
+- Git branch + status in prompt (`*` unstaged, `+` staged)
+- Plugins: zsh-autosuggestions, zsh-syntax-highlighting
+
+**Bash/Zsh Relationship:**
+- Zsh does NOT read `.bashrc` or `.bash_profile` - they're separate shells
+- `.bashrc` kept for when bash is needed (scripts, emergency)
+- Aliases duplicated in both (may diverge as zsh-specific features added)
+
+### Configuration Files
+
+| Component | Config Location | Tracked in git |
+|-----------|-----------------|----------------|
+| Alacritty | `~/.config/alacritty/alacritty.toml` | Yes |
+| Tmux | `~/.config/tmux/tmux.conf` | Yes |
+| Zsh | `~/.zshenv`, `~/.config/zsh/.zshrc` | Yes |
+| Zsh plugins | `~/.local/share/zsh/plugins/` | Yes |
+| Bash | `~/.bashrc` | Yes |
+
+### Behavior Flow
+
+1. Open alacritty -> spawns zsh
+2. Zsh checks if in PTY (`/dev/pts/*`) and not already in tmux
+3. If true, `exec tmux` replaces zsh with tmux
+4. Tmux spawns new zsh instances in each pane
+5. Each pane gets its own PTY under `/dev/pts/`
+
+### Observations
+
+**Working well:**
+- Vim keybindings in tmux
+- Session persistence (resurrect + continuum)
+- Clean separation of concerns
+
+**Potential improvements:**
+- Tmux uses `xclip` but system is Wayland -> should use `wl-copy`
+- Many tmux plugins - evaluate which are actually used
+- Zsh will replace bash for better completion and vim mode in shell itself
 
 ---
 
