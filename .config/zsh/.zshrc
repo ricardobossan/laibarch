@@ -74,8 +74,7 @@ zstyle ':vcs_info:git:*' unstagedstr '*'
 zstyle ':vcs_info:git:*' stagedstr '+'
 
 setopt PROMPT_SUBST
-PROMPT='[%n@%m %1~${vcs_info_msg_0_}]$ '
-
+PROMPT='%B%F{cyan}%1~%f%b%F{magenta}${vcs_info_msg_0_}%f %F{green}$%f '
 # -----------------------------------------------------------------------------
 # Plugins (clone manually to ~/.local/share/zsh/plugins/)
 # -----------------------------------------------------------------------------
