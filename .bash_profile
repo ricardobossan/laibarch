@@ -11,7 +11,7 @@ export XKB_DEFAULT_LAYOUT=us
 export XKB_DEFAULT_VARIANT=intl
 
 # Adds local executables to PATH
-export PATH=$PATH+=":${HOME}/.local/bin;${HOME}/.cargo/bin"
+export PATH="$PATH:${HOME}/.local/bin:${HOME}/.cargo/bin"
 
 # Start SSH agent if not running
 if ! pgrep -u "$USER" ssh-agent > /dev/null; then
