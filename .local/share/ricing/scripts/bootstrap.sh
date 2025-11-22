@@ -89,6 +89,10 @@ systemctl --user enable --now wireplumber && echo "  ✓ wireplumber"
 # File syncing
 systemctl --user enable --now syncthing && echo "  ✓ syncthing"
 
+# System monitors (battery and temperature warnings)
+systemctl --user enable --now battery-monitor.timer && echo "  ✓ battery-monitor.timer"
+systemctl --user enable --now temp-monitor.timer && echo "  ✓ temp-monitor.timer"
+
 echo "Service setup complete!"
 echo ""
 echo "Done! Reboot and dwl should start."
