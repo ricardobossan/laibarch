@@ -17,12 +17,12 @@ Creates `laibarch-repo.iso` containing the entire repository.
 Boot from official Arch ISO, attach `laibarch-repo.iso` as second CD-ROM (or USB), then:
 
 ```bash
-# Mount repository
-mkdir /mnt/repo
-mount /dev/sr0 /mnt/repo  # or sr1 (check with lsblk), or /dev/sdX for USB
+# Mount repository (use /repo, NOT under /mnt - it gets unmounted during install)
+mkdir /repo
+mount /dev/sr0 /repo  # or sr1 (check with lsblk), or /dev/sdX for USB
 
 # Run installation script
-bash /mnt/repo/.local/share/ricing/laibarch-install.sh
+bash /repo/.local/share/ricing/laibarch-install.sh
 ```
 
 **The script auto-detects you're on live ISO and runs Phase 1:**
@@ -42,10 +42,11 @@ Reboot, unlock disk encryption, login as root, then:
 
 ```bash
 # Mount repository again
-mount /dev/sr0 /mnt/repo  # or sr1, check with lsblk
+mkdir /repo
+mount /dev/sr0 /repo  # or sr1, check with lsblk
 
 # Run SAME script - it detects Phase 2
-bash /mnt/repo/.local/share/ricing/laibarch-install.sh
+bash /repo/.local/share/ricing/laibarch-install.sh
 ```
 
 **The script auto-detects you're on installed system and runs Phase 2:**

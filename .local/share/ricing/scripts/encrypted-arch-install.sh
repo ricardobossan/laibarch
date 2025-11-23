@@ -259,9 +259,9 @@ Base installation finished! Next steps:
   3. Boot into new system (will prompt for encryption password)
   4. Login as root
   5. Mount your repository ISO/share containing laibarch:
-     mkdir /mnt/repo
-     mount /dev/sr0 /mnt/repo  (for ISO)
-  6. Run: bash /mnt/repo/.local/share/ricing/laibarch-install.sh
+     mkdir /repo
+     mount /dev/sr0 /repo  (for ISO)
+  6. Run: bash /repo/.local/share/ricing/laibarch-install.sh
 
 EOF
 echo -e "${YELLOW}IMPORTANT: Keep your repository ISO/share available!${NC}"
