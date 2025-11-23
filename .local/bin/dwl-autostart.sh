@@ -17,6 +17,15 @@ swww-daemon --no-cache &
 # Set wallpaper from Reddit
 ~/.local/bin/reddit-wallpaper.sh &
 
+# Idle management - screen blanking and lock
+# Suspend skipped if file transfer (cp/rsync/mv) or torrent daemon running
+swayidle -w \
+    timeout 300 'brightnessctl set 0' \
+    timeout 330 'swaylock -f' \
+    timeout 900 'pgrep -x cp || pgrep -x rsync || pgrep -x mv || pgrep -x transmission-da || systemctl suspend' \
+    resume 'brightnessctl set 100%' \
+    before-sleep 'swaylock -f' &
+
 # Auto-adjust color temperature based on time of day
 (
   LOCATION=$(curl -s --max-time 5 "https://api.positon.xyz/v1/geolocate?key=56aba903-ae67-4f26-919b-15288b44bda9" \

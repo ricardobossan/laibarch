@@ -75,6 +75,8 @@ obsidian
 obsidian-icon-theme
 gammastep
 geoclue
+swayidle
+swaylock
 libnotify
 python-pip
 python-pipx
