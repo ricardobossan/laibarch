@@ -18,8 +18,8 @@ EOF
 
 read -p "Install additional applications? (y/n): " INSTALL_ADDITIONAL
 if [ "$INSTALL_ADDITIONAL" != "y" ]; then
-    echo "Skipping additional applications."
-    exit 0
+  echo "Skipping additional applications."
+  exit 0
 fi
 
 echo ""
@@ -28,10 +28,10 @@ echo "--------------------------------"
 
 # Add Flathub repository if not already added
 if ! flatpak remotes | grep -q flathub; then
-    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-    echo "✓ Flathub repository added"
+  flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+  echo "✓ Flathub repository added"
 else
-    echo "✓ Flathub repository already configured"
+  echo "✓ Flathub repository already configured"
 fi
 
 echo ""
@@ -41,14 +41,21 @@ echo "--------------------------------"
 flatpak install -y flathub com.valvesoftware.Steam
 echo "✓ Steam installed"
 
+echo ""
+echo "Installing Slack..."
+echo "--------------------------------"
+
+yay -S slack-desktop --noconfirm
+echo "✓ Slack installed"
+
 cat <<'EOF'
 
 ========================================
   Additional Applications Installed!
 ========================================
 
-Steam launchers (already in ~/.local/bin/):
-  steam   - Uses Gamescope (recommended)
-  xsteam  - Uses XWayland (for games with input issues like ETS2)
-
+- Steam launchers
+  - steam   - Uses Gamescope (recommended)
+  - xsteam  - Uses XWayland (for games with input issues like ETS2)
+- Slack
 EOF
