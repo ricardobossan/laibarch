@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# Steam launcher using XWayland
+#
+# Use this for games with mouse/input issues under Gamescope or native Wayland.
+# Known problematic games:
+# - Euro Truck Simulator 2
+# - American Truck Simulator
+# - Other older titles with poor Wayland support
+#
+# This starts a dedicated XWayland server on DISPLAY :0 and runs Steam through it,
+# providing X11 compatibility for proper mouse capture and input handling.
+#
+# For most games, use 'steam' (Gamescope) instead for better performance.
+
+# Start XWayland if not running
+if ! pgrep -f "Xwayland :0" >/dev/null; then
+    Xwayland :0 >/dev/null 2>&1 &
+    sleep 1
+    export DISPLAY=:0
+    dbus-update-activation-environment --systemd DISPLAY
+fi
+
+DISPLAY=:0 flatpak run com.valvesoftware.Steam "$@"

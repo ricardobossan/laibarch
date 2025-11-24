@@ -262,6 +262,11 @@ echo "Installing additional programs from source..."
 sudo -u "$NEW_USER" HOME="/home/$NEW_USER" bash "$SCRIPT_DIR/scripts/programs-scripts.sh"
 echo ""
 
+# Run additional-apps as the new user (with proper HOME)
+echo "Optional additional applications..."
+sudo -u "$NEW_USER" HOME="/home/$NEW_USER" bash "$SCRIPT_DIR/scripts/additional-apps.sh"
+echo ""
+
 cat <<EOF
 ========================================
   Laibarch Installation Complete!

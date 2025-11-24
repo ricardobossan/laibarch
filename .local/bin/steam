@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# Steam launcher using Gamescope compositor
+#
+# Advantages over plain XWayland:
+# - Better frame pacing and VSync handling
+# - Built-in FSR upscaling support
+# - Seamless alt-tab (no mode switching)
+# - Proper cursor confinement
+#
+# For games with mouse/input issues (e.g., Euro Truck Simulator 2),
+# use 'xsteam' instead which runs through XWayland.
+#
+# Options:
+#   --backend wayland    Use Wayland backend
+#   --force-grab-cursor  Ensure proper mouse capture
+#   -W 2560 -H 1080      Resolution (adjust to your display)
+#   -f                   Fullscreen
+
+gamescope --backend wayland --force-grab-cursor -W 2560 -H 1080 -f -- flatpak run com.valvesoftware.Steam "$@"

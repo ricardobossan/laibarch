@@ -86,3 +86,6 @@ python-pipx
 ksnip
 translate-shell
 zathura-pdf-mupdf
+vulkan-radeon
+xorg-xwayland
+gamescope
