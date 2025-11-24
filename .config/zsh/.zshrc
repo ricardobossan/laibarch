@@ -109,17 +109,18 @@ alias \
     calcurse="calcurse -D ${HOME}/Documents/calcurse" \
     fd="fd -iH" \
     rg="rg -iH" \
+    wcp="wl-copy" \
     suspend="systemctl suspend"
 
 # Shortcuts
 alias \
-    cfz="\$EDITOR ${ZDOTDIR}/.zshrc" \
-    cfb="\$EDITOR ${HOME}/.bashrc" \
     ric="cd ${HOME}/Documents/ricardo && \${EDITOR} vault-root.md +ObsidianToday" \
     ether="cd ${HOME}/Documents/mai/ether && \${EDITOR} ether\ \(todos\).md" \
     bys="cd ${HOME}/Documents/bys && \${EDITOR} ." \
     docs="cd ${HOME}/Documents/zettelkasten && \${EDITOR} ." \
     cf="cd ${HOME}/.config" \
+    cfz="\$EDITOR ${ZDOTDIR}/.zshrc" \
+    cfb="\$EDITOR ${HOME}/.bashrc" \
     repo="cd ${HOME}/source/repos" \
     rice="cd ${HOME}/.local/share/ricing"
 
