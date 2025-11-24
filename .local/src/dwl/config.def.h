@@ -145,8 +145,8 @@ static const char *clipmenu[] = { "/bin/sh", "-c",
   NULL };
 static const char *volup[]   = { "wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%+", NULL };
 static const char *voldown[] = { "wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "5%-", NULL };
-static const char *briup[]   = { "brightnessctl", "set", "5%+", NULL };
-static const char *bridown[] = { "brightnessctl", "set", "5%-", NULL };
+static const char *briup[]   = { "sh", "-c", "$HOME/.local/bin/brightness.sh up 5", NULL };
+static const char *bridown[] = { "sh", "-c", "$HOME/.local/bin/brightness.sh down 5", NULL };
 
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */

@@ -44,12 +44,15 @@ else
     echo "Skipping dwl installation."
 fi
 
-# Install dwl status click handler
-echo "Installing status bar click handler..."
+# Install dwl status click handler and brightness script
+echo "Installing status bar scripts..."
 mkdir -p ${HOME}/.local/bin
+mkdir -p ${HOME}/Documents/Pictures/screenshots
 cp "$SCRIPT_DIR/../dwl-status-click.sh" ${HOME}/.local/bin/
+cp "$SCRIPT_DIR/../brightness.sh" ${HOME}/.local/bin/
 chmod +x ${HOME}/.local/bin/dwl-status-click.sh
-echo "Click handler installed successfully!"
+chmod +x ${HOME}/.local/bin/brightness.sh
+echo "Scripts installed successfully!"
 
 # Stow system configs
 #cd "$REPO_ROOT/root" && sudo stow -t / .
@@ -77,6 +80,10 @@ fi
 
 # SSD TRIM (recommended for SSD health)
 sudo systemctl enable --now fstrim.timer && echo "  ✓ fstrim.timer"
+
+# i2c-dev module for ddcutil (external monitor brightness control)
+echo "i2c-dev" | sudo tee /etc/modules-load.d/i2c-dev.conf > /dev/null && echo "  ✓ i2c-dev module configured"
+sudo modprobe i2c-dev 2>/dev/null && echo "  ✓ i2c-dev module loaded" || echo "  ⚠ i2c-dev module not available (OK on some systems)"
 
 # User services
 echo "Enabling user services..."

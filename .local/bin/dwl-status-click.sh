@@ -32,8 +32,11 @@ ram)
 temp)
   case "$button" in
   1) # Left click - show temperature details
-    temp=$(sensors 2>/dev/null || cat /sys/class/thermal/thermal_zone*/temp 2>/dev/null | head -1 | awk '{print $1/1000 "°C"}')
-    notify-send "Temperature" "System: $temp"
+    temp_info=$(sensors 2>/dev/null | grep -E '^(k10temp|amdgpu|nvme|coretemp)' -A5 | grep -E '(Tctl|edge|Composite|Core|temp1):' | head -5)
+    if [ -z "$temp_info" ]; then
+      temp_info=$(cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null | awk '{printf "%.0f°C", $1/1000}')
+    fi
+    notify-send "Temperature" "$temp_info"
     ;;
   3) # Right click - open sensors
     alacritty -e watch -n1 sensors &

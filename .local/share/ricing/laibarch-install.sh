@@ -174,10 +174,13 @@ if id "$NEW_USER" &>/dev/null; then
     if [ "$UPDATE_PASS" = "y" ]; then
         passwd "$NEW_USER"
     fi
+
+    # Ensure user is in i2c group (for ddcutil external monitor brightness)
+    usermod -aG i2c "$NEW_USER" 2>/dev/null
 else
-    # Create new user with home directory, add to wheel group, set bash as shell
+    # Create new user with home directory, add to wheel and i2c groups, set bash as shell
     echo "Creating user $NEW_USER..."
-    useradd -mG wheel -s /bin/bash "$NEW_USER"
+    useradd -mG wheel,i2c -s /bin/bash "$NEW_USER"
 
     # Set password for new user
     echo "Set password for user $NEW_USER:"

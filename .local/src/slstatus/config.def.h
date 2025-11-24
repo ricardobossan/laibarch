@@ -68,10 +68,10 @@ static const struct arg args[] = {
     /* function         format                                    argument */
     { cpu_perc,         "^wcpu^^c#61AFEF^󰍛 %s%% │ ",           NULL },
     { ram_perc,         "^wram^^c#E06C75^󰑭 %s%% │ ",           NULL },
-    { temp,             "^wtemp^^c#E5C07B^🌡 %s°C │ ",          "/sys/class/thermal/thermal_zone0/temp" },
+    { run_command,      "^wtemp^^c#E5C07B^🌡 %s°C │ ",          "sensors -u 2>/dev/null | awk '/temp[0-9]_input/{if($2>max)max=$2} END{if(max>0){printf \"%.0f\", max}else{exit 1}}' || cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null | awk '{printf \"%.0f\", $1/1000}' || echo 'n/a'" },
     { run_command,      "^wnetwork^^c#98C379^📶 %s ",           "nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d':' -f2 | head -1" },
     { run_command,      "(%s%%) │ ",                            "nmcli -t -f in-use,signal dev wifi | grep '^\\*' | cut -d':' -f2" },
-    { run_command,      "^wvolume^^c#C678DD^🔊 %s%% │ ",        "amixer sget Master | awk -F'[][]' '/Left:/ { print $2 }' | tr -d '%'" },
+    { run_command,      "^wvolume^^c#C678DD^🔊 %s%% │ ",        "wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{print int($2*100)}'" },
     { battery_perc,     "^wbattery^^c#56B6C2^🔋 %s%% │ ",       "BAT0" },
     { datetime,         "^wdatetime^^c#D19A66^⏰ %s",           "%a %b %d %l:%M %p" },
 };
