@@ -1,0 +1,10 @@
+[Unit]
+Description=Temperature Monitor
+After=graphical-session.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/temp-monitor.sh
+
+[Install]
+WantedBy=default.target

@@ -16,6 +16,10 @@
 !.config/zsh/.zshrc
 !.config/zsh/.zprofile
 .config/zsh/.zhistory
+!.config/systemd/
+!.config/systemd/user/
+!.config/systemd/user/*.service
+!.config/systemd/user/*.timer
 !.zshenv
 !.gitmodules
 !.local
