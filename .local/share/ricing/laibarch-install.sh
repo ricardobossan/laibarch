@@ -3,20 +3,20 @@
 # Run this as ROOT from Arch Live ISO or after first boot
 # This script handles both base installation and post-installation automatically
 
-set -e  # Exit on error
+set -e # Exit on error
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # Check if running as root
 if [ "$EUID" -ne 0 ]; then
-    echo "ERROR: This script must be run as root"
-    echo "Usage: sudo bash laibarch-install.sh"
-    exit 1
+  echo "ERROR: This script must be run as root"
+  echo "Usage: sudo bash laibarch-install.sh"
+  exit 1
 fi
 
 # Detect if running from live ISO or installed system
 if [ -d /run/archiso ]; then
-    cat <<'EOF'
+  cat <<'EOF'
 ========================================
   Laibarch Complete Installation
   Phase 1: Base Installation
@@ -29,99 +29,99 @@ This will run the complete installation:
   (After reboot, run this script again for Phase 2)
 
 EOF
-    read -p "Continue with Phase 1? (y/n): " CONTINUE
-    if [ "$CONTINUE" != "y" ]; then
-        exit 0
-    fi
-    echo ""
-
-    # Check/setup internet connection
-    echo "Verifying internet connection..."
-    if ping -c 1 archlinux.org &> /dev/null; then
-        echo "✓ Internet connection active"
-        echo ""
-    else
-        echo "No internet connection detected."
-        echo ""
-        echo "Connection options:"
-        echo "  1. Ethernet (automatic - just plug cable)"
-        echo "  2. WiFi (setup required)"
-        echo ""
-        read -p "Need to setup WiFi? (y/n): " SETUP_WIFI
-
-        if [ "$SETUP_WIFI" = "y" ]; then
-            echo ""
-            echo "Setting up WiFi with iwd..."
-            echo ""
-
-            # Get WiFi device name
-            WIFI_DEVICE=$(iwctl device list | grep -oP '^\s*\K\w+(?=\s+station)' | head -1)
-
-            if [ -z "$WIFI_DEVICE" ]; then
-                echo "No WiFi device found. Trying to unblock..."
-                rfkill unblock wifi
-                sleep 2
-                WIFI_DEVICE=$(iwctl device list | grep -oP '^\s*\K\w+(?=\s+station)' | head -1)
-            fi
-
-            if [ -z "$WIFI_DEVICE" ]; then
-                echo "ERROR: No WiFi device detected"
-                exit 1
-            fi
-
-            echo "WiFi device: $WIFI_DEVICE"
-            echo ""
-
-            # Scan for networks
-            echo "Scanning for networks..."
-            iwctl station "$WIFI_DEVICE" scan
-            sleep 3
-
-            # Show available networks
-            echo "Available networks:"
-            iwctl station "$WIFI_DEVICE" get-networks
-            echo ""
-
-            # Connect
-            read -p "Enter WiFi SSID: " WIFI_SSID
-
-            if [ -z "$WIFI_SSID" ]; then
-                echo "ERROR: SSID cannot be empty"
-                exit 1
-            fi
-
-            echo "Connecting to $WIFI_SSID..."
-            iwctl station "$WIFI_DEVICE" connect "$WIFI_SSID"
-
-            sleep 3
-
-            # Verify connection
-            if ping -c 1 archlinux.org &> /dev/null; then
-                echo "✓ Connected successfully"
-                echo ""
-            else
-                echo "ERROR: Connection failed"
-                exit 1
-            fi
-        else
-            echo ""
-            read -p "Press Enter after connecting to internet..."
-
-            if ! ping -c 1 archlinux.org &> /dev/null; then
-                echo "ERROR: No internet connection. Cannot proceed."
-                exit 1
-            fi
-            echo "✓ Internet connection verified"
-            echo ""
-        fi
-    fi
-
-    # Run base installation
-    bash "$SCRIPT_DIR/scripts/encrypted-arch-install.sh"
-
-    # Script will exit here after base installation completes
-    # User must reboot and run again
+  read -p "Continue with Phase 1? (y/n): " CONTINUE
+  if [ "$CONTINUE" != "y" ]; then
     exit 0
+  fi
+  echo ""
+
+  # Check/setup internet connection
+  echo "Verifying internet connection..."
+  if ping -c 1 archlinux.org &>/dev/null; then
+    echo "✓ Internet connection active"
+    echo ""
+  else
+    echo "No internet connection detected."
+    echo ""
+    echo "Connection options:"
+    echo "  1. Ethernet (automatic - just plug cable)"
+    echo "  2. WiFi (setup required)"
+    echo ""
+    read -p "Need to setup WiFi? (y/n): " SETUP_WIFI
+
+    if [ "$SETUP_WIFI" = "y" ]; then
+      echo ""
+      echo "Setting up WiFi with iwd..."
+      echo ""
+
+      # Get WiFi device name
+      WIFI_DEVICE=$(iwctl device list | grep -oP '^\s*\K\w+(?=\s+station)' | head -1)
+
+      if [ -z "$WIFI_DEVICE" ]; then
+        echo "No WiFi device found. Trying to unblock..."
+        rfkill unblock wifi
+        sleep 2
+        WIFI_DEVICE=$(iwctl device list | grep -oP '^\s*\K\w+(?=\s+station)' | head -1)
+      fi
+
+      if [ -z "$WIFI_DEVICE" ]; then
+        echo "ERROR: No WiFi device detected"
+        exit 1
+      fi
+
+      echo "WiFi device: $WIFI_DEVICE"
+      echo ""
+
+      # Scan for networks
+      echo "Scanning for networks..."
+      iwctl station "$WIFI_DEVICE" scan
+      sleep 3
+
+      # Show available networks
+      echo "Available networks:"
+      iwctl station "$WIFI_DEVICE" get-networks
+      echo ""
+
+      # Connect
+      read -p "Enter WiFi SSID: " WIFI_SSID
+
+      if [ -z "$WIFI_SSID" ]; then
+        echo "ERROR: SSID cannot be empty"
+        exit 1
+      fi
+
+      echo "Connecting to $WIFI_SSID..."
+      iwctl station "$WIFI_DEVICE" connect "$WIFI_SSID"
+
+      sleep 3
+
+      # Verify connection
+      if ping -c 1 archlinux.org &>/dev/null; then
+        echo "✓ Connected successfully"
+        echo ""
+      else
+        echo "ERROR: Connection failed"
+        exit 1
+      fi
+    else
+      echo ""
+      read -p "Press Enter after connecting to internet..."
+
+      if ! ping -c 1 archlinux.org &>/dev/null; then
+        echo "ERROR: No internet connection. Cannot proceed."
+        exit 1
+      fi
+      echo "✓ Internet connection verified"
+      echo ""
+    fi
+  fi
+
+  # Run base installation
+  bash "$SCRIPT_DIR/scripts/encrypted-arch-install.sh"
+
+  # Script will exit here after base installation completes
+  # User must reboot and run again
+  exit 0
 fi
 
 cat <<'EOF'
@@ -141,7 +141,7 @@ This script will:
 EOF
 read -p "Continue with Phase 2? (y/n): " CONTINUE
 if [ "$CONTINUE" != "y" ]; then
-    exit 0
+  exit 0
 fi
 echo ""
 
@@ -151,40 +151,40 @@ echo "--------------------------------"
 read -p "Enter username: " NEW_USER
 
 if [ -z "$NEW_USER" ]; then
-    echo "ERROR: Username cannot be empty"
-    exit 1
+  echo "ERROR: Username cannot be empty"
+  exit 1
 fi
 
 # Check if user already exists
 if id "$NEW_USER" &>/dev/null; then
-    echo "User '$NEW_USER' already exists."
-    read -p "Use existing user? (y/n): " USE_EXISTING
-    if [ "$USE_EXISTING" != "y" ]; then
-        echo "Installation cancelled."
-        exit 0
-    fi
+  echo "User '$NEW_USER' already exists."
+  read -p "Use existing user? (y/n): " USE_EXISTING
+  if [ "$USE_EXISTING" != "y" ]; then
+    echo "Installation cancelled."
+    exit 0
+  fi
 
-    # Ensure user is in wheel group
-    if ! groups "$NEW_USER" | grep -q wheel; then
-        echo "Adding $NEW_USER to wheel group..."
-        usermod -aG wheel "$NEW_USER"
-    fi
+  # Ensure user is in wheel group
+  if ! groups "$NEW_USER" | grep -q wheel; then
+    echo "Adding $NEW_USER to wheel group..."
+    usermod -aG wheel "$NEW_USER"
+  fi
 
-    read -p "Update password for $NEW_USER? (y/n): " UPDATE_PASS
-    if [ "$UPDATE_PASS" = "y" ]; then
-        passwd "$NEW_USER"
-    fi
-
-    # Ensure user is in i2c group (for ddcutil external monitor brightness)
-    usermod -aG i2c "$NEW_USER" 2>/dev/null
-else
-    # Create new user with home directory, add to wheel and i2c groups, set bash as shell
-    echo "Creating user $NEW_USER..."
-    useradd -mG wheel,i2c -s /bin/bash "$NEW_USER"
-
-    # Set password for new user
-    echo "Set password for user $NEW_USER:"
+  read -p "Update password for $NEW_USER? (y/n): " UPDATE_PASS
+  if [ "$UPDATE_PASS" = "y" ]; then
     passwd "$NEW_USER"
+  fi
+
+  # Ensure user is in i2c group (for ddcutil external monitor brightness)
+  usermod -aG i2c "$NEW_USER" 2>/dev/null
+else
+  # Create new user with home directory, add to wheel and i2c groups, set bash as shell
+  echo "Creating user $NEW_USER..."
+  useradd -mG wheel,i2c -s /bin/bash "$NEW_USER"
+
+  # Set password for new user
+  echo "Set password for user $NEW_USER:"
+  passwd "$NEW_USER"
 fi
 echo ""
 
@@ -207,34 +207,34 @@ echo ""
 
 # Check if user's home is already a git repository
 if [ -d "$USER_HOME/.git" ]; then
-    echo "User home is already a git repository, skipping copy..."
+  echo "User home is already a git repository, skipping copy..."
 else
-    # Check if source is a git repository
-    if [ ! -d "$REPO_ROOT/.git" ]; then
-        echo "WARNING: Source ($REPO_ROOT) is not a git repository!"
-        echo "Cannot setup git repository in user home."
-        echo ""
-        read -p "Press Enter to continue anyway..."
+  # Check if source is a git repository
+  if [ ! -d "$REPO_ROOT/.git" ]; then
+    echo "WARNING: Source ($REPO_ROOT) is not a git repository!"
+    echo "Cannot setup git repository in user home."
+    echo ""
+    read -p "Press Enter to continue anyway..."
+  else
+    # Copy the entire repo structure to user's home, including .git
+    echo "Copying repository files (including .git) from $REPO_ROOT to $USER_HOME..."
+    # Use rsync if available, otherwise cp
+    if command -v rsync &>/dev/null; then
+      rsync -av "$REPO_ROOT/" "$USER_HOME/"
     else
-        # Copy the entire repo structure to user's home, including .git
-        echo "Copying repository files (including .git) from $REPO_ROOT to $USER_HOME..."
-        # Use rsync if available, otherwise cp
-        if command -v rsync &> /dev/null; then
-            rsync -av "$REPO_ROOT/" "$USER_HOME/"
-        else
-            cp -r "$REPO_ROOT/." "$USER_HOME/"
-        fi
-
-        # Fix ownership
-        chown -R "$NEW_USER:$NEW_USER" "$USER_HOME"
-
-        echo "Repository copied successfully!"
+      cp -r "$REPO_ROOT/." "$USER_HOME/"
     fi
+
+    # Fix ownership
+    chown -R "$NEW_USER:$NEW_USER" "$USER_HOME"
+
+    echo "Repository copied successfully!"
+  fi
 fi
 
 # Always ensure git safe directory is configured
 if [ -d "$USER_HOME/.git" ]; then
-    sudo -u "$NEW_USER" git -C "$USER_HOME" config --global --add safe.directory "$USER_HOME" 2>/dev/null || true
+  sudo -u "$NEW_USER" git -C "$USER_HOME" config --global --add safe.directory "$USER_HOME" 2>/dev/null || true
 fi
 
 echo ""
@@ -278,6 +278,6 @@ Installation finished! You can now:
   3. DWL should start automatically
 
 NOTE: Auto-login configuration should be done in your private
-personal-configs repository for additional security customization.
+personal configs for additional security customization.
 
 EOF
