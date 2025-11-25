@@ -180,14 +180,67 @@ Device naming: `/dev/nvme0n1` (NVMe) or `/dev/sda` (SATA) - auto-detected
 
 ---
 
+## Hardware-Specific Features
+
+### Brightness Control
+
+Works on both laptops and desktops via universal script (`~/.local/bin/brightness.sh`):
+
+**Laptops:**
+- Uses `brightnessctl` for built-in backlight
+- Detects `class 'backlight'` devices
+
+**Desktops:**
+- Uses `ddcutil` for external monitors (DDC/CI protocol)
+- Requires `i2c-dev` kernel module (auto-loaded)
+- User must be in `i2c` group (auto-configured)
+
+Keybindings: `MODKEY+Shift+-` / `MODKEY+Shift+=`
+
+### Temperature Monitoring
+
+Status bar shows highest temperature across all sensors:
+
+**Detection priority:**
+1. `sensors` command (lm_sensors) - reads all hwmon devices
+2. Falls back to `/sys/class/thermal/thermal_zone0/temp` (laptops)
+3. Shows `n/a` if no sensors available
+
+**Desktop systems:**
+- k10temp (AMD Ryzen CPU)
+- amdgpu (AMD GPU edge temp)
+- nvme (NVMe SSD)
+
+**Laptop systems:**
+- ACPI thermal zones
+
+Click widget shows detailed per-component temperatures.
+
+### Systemd User Services
+
+Battery and temperature monitors run as systemd user timers:
+
+**Battery Monitor** (`battery-monitor.timer`):
+- Runs every 2 minutes
+- Sends notifications at 20%, 10%, 5% levels
+- Only active on systems with battery
+
+**Temperature Monitor** (`temp-monitor.timer`):
+- Runs every 1 minute
+- Sends notification if any sensor exceeds 80°C
+- Works on desktops and laptops
+
+Services located at: `~/.config/systemd/user/`
+
 ## Notes
 
 - **LUKS encryption**: Password required on every boot (set during Phase 1)
-- **Auto-login**: Not included (add in private configurations if desired)
+- **Auto-login**: Not included (add separately if desired)
 - **iwd backend**: Configured during base installation; NetworkManager uses iwd from first boot
 - **WiFi setup**: Phase 1 handles WiFi connection for live ISO; your credentials persist after install
 - **Device detection**: Scripts auto-detect VM/NVMe/SATA disks
 - **Patched sources**: DWL/slstatus at `~/.local/src/`
+- **Repository structure**: Entire `$HOME` is a git repository with selective `.gitignore`
 - **Repository copy**: Entire repo copied to user's home during Phase 2
 - **External programs**: Cloned to `~/source/repos/`
 
