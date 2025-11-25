@@ -102,4 +102,10 @@ systemctl --user enable --now temp-monitor.timer && echo "  ✓ temp-monitor.tim
 
 echo "Service setup complete!"
 echo ""
-echo "Done! Reboot and dwl should start."
+
+# Setup autologin for convenience
+echo "Setting up autologin..."
+bash "$SCRIPT_DIR/setup-autologin.sh" "$USER" && echo "  ✓ autologin configured"
+echo ""
+
+echo "Done! Reboot and dwl should start with autologin."

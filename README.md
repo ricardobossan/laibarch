@@ -124,6 +124,7 @@ After laibarch installation completes, the system is fully functional with:
 - ✅ Network connected (WiFi credentials persist)
 - ✅ All services enabled
 - ✅ User services monitoring battery/temperature
+- ✅ Auto-login enabled (no password after LUKS unlock)
 
 ### Optional Next Steps
 
@@ -131,7 +132,6 @@ You may want to add:
 - SSH/GPG keys for git access
 - Personal dotfiles and configs
 - Password managers and secret storage
-- Auto-login configuration (if desired)
 - Additional applications
 
 **Keep private configs separate** from this public repository.
@@ -147,9 +147,9 @@ Detailed documentation in `.local/share/ricing/README.md`:
 
 ## Security
 
-- LUKS encryption with user-chosen password
+- LUKS encryption with user-chosen password (required on boot)
+- Auto-login enabled after LUKS unlock (convenience)
 - No hardcoded credentials
-- Auto-login intentionally excluded
 - Safe for public sharing
 - Private configs kept separate
 

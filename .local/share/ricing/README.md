@@ -235,7 +235,7 @@ Services located at: `~/.config/systemd/user/`
 ## Notes
 
 - **LUKS encryption**: Password required on every boot (set during Phase 1)
-- **Auto-login**: Not included (add separately if desired)
+- **Auto-login**: Enabled for TTY1 (user auto-logs in after LUKS unlock)
 - **iwd backend**: Configured during base installation; NetworkManager uses iwd from first boot
 - **WiFi setup**: Phase 1 handles WiFi connection for live ISO; your credentials persist after install
 - **Device detection**: Scripts auto-detect VM/NVMe/SATA disks
