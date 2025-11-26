@@ -90,3 +90,5 @@ vulkan-radeon
 xorg-xwayland
 gamescope
 aria2
+rsync
+ueberzugpp
