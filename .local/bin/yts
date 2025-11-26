@@ -1,19 +1,44 @@
 #!/bin/bash
-# YouTube search and play in mpv
+# YouTube search and play in mpv with thumbnails
 
 if [ -z "$1" ]; then
     echo "Usage: yts <search query>"
     exit 1
 fi
 
-# Search YouTube (takes ~20 seconds, be patient)
-echo "Searching YouTube for '$*'... (this takes ~20 seconds)" >&2
+# Create temp directory for thumbnails
+THUMB_DIR=$(mktemp -d)
+trap "rm -rf $THUMB_DIR" EXIT
 
+# Search YouTube (fast with --flat-playlist, just need IDs)
+echo "Searching YouTube for '$*'..." >&2
+
+# Get video info quickly using flat-playlist
 yt-dlp "ytsearch10:$*" \
-    --get-title --get-id --no-playlist \
+    --get-title --get-id \
+    --no-playlist \
     --extractor-args "youtube:player_client=default" \
     --flat-playlist 2>/dev/null | \
     paste - - | \
-    fzf --prompt="Select video: " --height=50% --reverse | \
-    awk '{print $NF}' | \
-    xargs -I {} mpv "https://youtube.com/watch?v={}"
+    while IFS=$'\t' read -r title id; do
+        # Download small thumbnail (mqdefault = 320x180, fast!)
+        curl -s "https://i.ytimg.com/vi/$id/mqdefault.jpg" -o "$THUMB_DIR/$id.jpg" &
+        echo "$THUMB_DIR/$id.jpg|$title|$id"
+    done > "$THUMB_DIR/list.txt"
+
+wait  # Wait for all thumbnails to download
+
+# Select with fzf showing thumbnails
+selected=$(cat "$THUMB_DIR/list.txt" | \
+    fzf --delimiter='|' \
+        --with-nth=2 \
+        --preview='chafa -f symbols -s 60x30 {1} 2>/dev/null || echo "Loading thumbnail..."' \
+        --preview-window=up:60% \
+        --prompt="Select video: " \
+        --height=100% \
+        --reverse | \
+    cut -d'|' -f3)
+
+if [ -n "$selected" ]; then
+    mpv "https://youtube.com/watch?v=$selected"
+fi
