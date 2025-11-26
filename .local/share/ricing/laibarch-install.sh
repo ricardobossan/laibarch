@@ -148,6 +148,13 @@ echo ""
 # Step 1: Create user
 echo "Step 1: User setup"
 echo "--------------------------------"
+
+# Ensure i2c group exists (needed for ddcutil external monitor brightness)
+if ! getent group i2c >/dev/null; then
+  echo "Creating i2c group..."
+  groupadd i2c
+fi
+
 read -p "Enter username: " NEW_USER
 
 if [ -z "$NEW_USER" ]; then
