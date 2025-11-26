@@ -1,11 +1,15 @@
 #!/bin/sh
 # This runs after dwl has started and WAYLAND_DISPLAY is set
 
-# Export display vars to D-Bus and systemd for Flatpak apps (Steam, etc.)
-dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY
+# Set standard display variables if they aren't already set by the login manager
+export WAYLAND_DISPLAY=${WAYLAND_DISPLAY:-wayland-0}
+export DISPLAY=${DISPLAY:-:0} # This might need adjustment if you have multiple X sessions
 
+# Prefer discrete GPU
 export DRI_PRIME=1
 
+# Update D-Bus activation environment for both Wayland and X variables
+dbus-update-activation-environment WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP
 # Configure displays
 ~/.local/bin/configure-displays.sh
 
