@@ -38,6 +38,7 @@
 !/.local/bin/battery-monitor.sh
 !/.local/bin/steam
 !/.local/bin/xsteam
+!/.local/bin/yts
 !.local/src/
 !.local/src/dwl
 !.local/src/dwl/**
