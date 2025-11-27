@@ -107,8 +107,8 @@ alias \
     vim="nvim" \
     obsidian="obsidian --enable-features=UseOzonePlatform --ozone-platform=wayland" \
     calcurse="calcurse -D ${HOME}/Documents/calcurse" \
-    fd="fd -iH" \
-    rg="rg -iH" \
+    fd="fd -IH" \
+    rg="rg -IH" \
     wcp="wl-copy" \
     suspend="systemctl suspend"
 
