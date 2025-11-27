@@ -16,6 +16,7 @@ return {
   dependencies = {
     -- Required.
     "nvim-lua/plenary.nvim",
+    "nvim-telescope/telescope.nvim",
 
     -- see below for full list of optional dependencies 👇
   },
@@ -45,6 +46,15 @@ return {
         path = "~/Documents/mai/",
       },
     },
+    finder = "telescope.nvim",
+    search_max_lines = 1000,
+    follow_url_func = function(url)
+      vim.fn.jobstart({"xdg-open", url})
+    end,
+    note_id_func = function(title)
+      return title
+    end,
+    disable_frontmatter = false,
     templates = {
       subdir = "templates",
       date_format = "%Y-%m-%d",
@@ -106,6 +116,14 @@ return {
   -- Inverts checkbox symbols order, so `>` comes before `x`.
   config = function(_, opts)
     local toggle_checkbox = require("obsidian.util").toggle_checkbox
+
+    -- Override search commands to ignore gitignore files
+    local search = require("obsidian.search")
+    local compat = require("obsidian.compat")
+    search._BASE_CMD = { "rg", "--no-config", "--no-ignore", "--type=md" }
+    search._SEARCH_CMD = compat.flatten { search._BASE_CMD, "--json" }
+    search._FIND_CMD = compat.flatten { search._BASE_CMD, "--files" }
+
     require("obsidian").setup(opts)
 
     local client = require("obsidian").get_client()
