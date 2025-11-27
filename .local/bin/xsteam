@@ -15,10 +15,10 @@
 
 # Start XWayland if not running
 if ! pgrep -f "Xwayland :0" >/dev/null; then
-    Xwayland :0 >/dev/null 2>&1 &
-    sleep 1
-    export DISPLAY=:0
-    dbus-update-activation-environment --systemd DISPLAY
+  Xwayland -fullscreen -geometry 2560x1080 :0 >/dev/null 2>&1 &
+  sleep 1
+  export DISPLAY=:0
+  dbus-update-activation-environment --systemd DISPLAY
 fi
 
 DISPLAY=:0 flatpak run com.valvesoftware.Steam "$@"
