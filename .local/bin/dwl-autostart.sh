@@ -21,6 +21,9 @@ wl-paste --type text --watch cliphist store &
 wl-paste --type image --watch cliphist store &
 wl-clip-persist --clipboard both &
 
+# Auto-mount removable drives
+udiskie &
+
 swww-daemon --no-cache &
 
 # Set wallpaper from Reddit

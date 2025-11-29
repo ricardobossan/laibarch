@@ -92,3 +92,5 @@ gamescope
 aria2
 rsync
 ueberzugpp
+udisks2
+udiskie
