@@ -1,4 +1,5 @@
 return {
+  --[[
   {
     "Exafunction/codeium.nvim",
     commit = "821b570b526dbb05b57aa4ded578b709a704a38a",
@@ -19,4 +20,5 @@ return {
     commit = "49f211fe5d729df53df4c042d7c3464cf47d199e",
     enabled = true,
   },
+  --]]
 }
