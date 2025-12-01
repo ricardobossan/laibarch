@@ -1,0 +1,27 @@
+#!/usr/bin/env zsh
+#
+# LeetCode workflow automation script
+# Opens LibreOffice Calc with progress tracking and creates/switches to a
+# dedicated tmux session with leetcode.nvim and repository windows
+
+# 1. Launch LibreOffice Calc with spreadsheet in background
+libreoffice --calc "$HOME/source/repos/leetcode/dsa-progress-tracking.ods" &>/dev/null &
+
+# 2. Check if 'leetcode' session already exists
+if tmux has-session -t leetcode 2>/dev/null; then
+    # Session exists: switch to leet-plugin window
+    tmux select-window -t leetcode:leet-plugin
+    tmux switch-client -t leetcode
+else
+    # Create new session with first window running nvim +Leet
+    tmux new-session -s leetcode -n "leet-plugin" -d "nvim +Leet"
+
+    # Create second window for repository (let tmux assign the number)
+    tmux new-window -t leetcode -n "repo" -c "$HOME/source/repos/leetcode" "nvim"
+
+    # Select leet-plugin window before switching
+    tmux select-window -t leetcode:leet-plugin
+
+    # Switch to the new session (will show leet-plugin)
+    tmux switch-client -t leetcode
+fi

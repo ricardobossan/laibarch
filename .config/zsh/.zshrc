@@ -98,7 +98,6 @@ alias \
     eza="eza -A1" \
     exmon='wlr-randr --output eDP-1 --off' \
     grep='grep --color=auto' \
-    leet="nvim +Leet" \
     ls='ls --color=auto' \
     lg='lazygit' \
     sourcez="source ${ZDOTDIR}/.zshrc" \
