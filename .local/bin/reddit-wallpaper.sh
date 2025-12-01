@@ -40,9 +40,9 @@ if [ -z "$JSON" ]; then
     exit 1
 fi
 
-# Extract image URLs (filter for direct image links and high resolution)
-# Looking for .jpg, .png, and i.redd.it links
-URLS=$(echo "$JSON" | jq -r '.data.children[].data | select(.post_hint == "image") | .url' | grep -E '\.(jpg|png)$|i\.redd\.it')
+# Extract image URLs (filter for direct image links and 4K+ resolution)
+# Looking for .jpg, .png, and i.redd.it links with width >= 3840px (4K)
+URLS=$(echo "$JSON" | jq -r '.data.children[].data | select(.post_hint == "image") | select(.preview.images[0].source.width >= 3840) | .url' | grep -E '\.(jpg|png)$|i\.redd\.it')
 
 if [ -z "$URLS" ]; then
     log "ERROR: No image URLs found, using default wallpaper"
