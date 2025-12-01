@@ -110,6 +110,7 @@ alias \
     fd="fd -IH" \
     rg="rg -IH" \
     wcp="wl-copy" \
+    rsync="rsync -av --info=progress2" \
     suspend="systemctl suspend"
 
 # Shortcuts
