@@ -179,6 +179,11 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_period,     focusmon,       {.i = WLR_DIRECTION_RIGHT} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_less,       tagmon,         {.i = WLR_DIRECTION_LEFT} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_greater,    tagmon,         {.i = WLR_DIRECTION_RIGHT} },
+	/* Arrow key alternatives for monitor focus/movement */
+	{ MODKEY,                    XKB_KEY_Left,       focusmon,       {.i = WLR_DIRECTION_LEFT} },
+	{ MODKEY,                    XKB_KEY_Right,      focusmon,       {.i = WLR_DIRECTION_RIGHT} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Left,       tagmon,         {.i = WLR_DIRECTION_LEFT} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Right,      tagmon,         {.i = WLR_DIRECTION_RIGHT} },
   /* Screenshot keybindings */
   /* Selection to screenshot file + clipboard */
   { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_S, spawn, SHCMD("sh -c 'outfile=~/Documents/Pictures/screenshots/screenshot_$(date +%Y%m%d_%H%M%S).png; slurp | grim -g - - | tee \"$outfile\" | wl-copy && notify-send \"Screenshot\" \"Selection saved and copied\"'") },
