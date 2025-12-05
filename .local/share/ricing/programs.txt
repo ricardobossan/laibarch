@@ -95,3 +95,4 @@ rsync
 ueberzugpp
 udisks2
 udiskie
+kanshi
