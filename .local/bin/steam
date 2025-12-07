@@ -17,4 +17,5 @@
 #   -W 2560 -H 1080      Resolution (adjust to your display)
 #   -f                   Fullscreen
 
-gamescope --backend wayland --force-grab-cursor -W 2560 -H 1080 -f -- flatpak run com.valvesoftware.Steam "$@"
+#gamescope --backend wayland --force-grab-cursor -W 2560 -H 1080 -f -- flatpak run com.valvesoftware.Steam "$@"
+gamescope --force-grab-cursor -b --backend sdl --xwayland-count 1 -W 3640 -H 1080 -f -- flatpak run com.valvesoftware.Steam "$@"

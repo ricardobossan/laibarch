@@ -3077,9 +3077,9 @@ tile(Monitor *m)
 		e = 0;
 
 	if (n > m->nmaster)
-		mw = m->nmaster ? (int)roundf((m->w.width + gappx*e) * m->mfact) : 0;
+		mw = m->nmaster ? (fixedmasterwidth > 0 ? fixedmasterwidth : (int)roundf((m->w.width + gappx*e) * m->mfact)) : 0;
 	else
-		mw = m->w.width;
+		mw = fixedmasterwidth > 0 ? fixedmasterwidth : m->w.width;
 	i = 0;
 	my = ty = gappx*e;
 	wl_list_for_each(c, &clients, link) {

@@ -15,7 +15,11 @@
 
 # Start XWayland if not running
 if ! pgrep -f "Xwayland :0" >/dev/null; then
-  Xwayland -fullscreen -geometry 2560x1080 :0 >/dev/null 2>&1 &
+  #Xwayland -fullscreen -geometry 2560x1080 :0 >/dev/null 2>&1 &
+  Xwayland -geometry 3640x1080 :0 >/dev/null 2>&1 &
+  #Xwayland -geometry 3640x1080 :0 >/dev/null 2>&1 &
+  #Xwayland -fullscreen :0 >/dev/null 2>&1 &
+
   sleep 1
   export DISPLAY=:0
   dbus-update-activation-environment --systemd DISPLAY
