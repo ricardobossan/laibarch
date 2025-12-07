@@ -96,3 +96,4 @@ ueberzugpp
 udisks2
 udiskie
 kanshi
+calc
