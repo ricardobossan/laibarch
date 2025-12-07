@@ -32,6 +32,7 @@
 !.local/bin/configure-displays.sh
 !.local/bin/dwl-autostart.sh
 !/.local/bin/dwl-status-click.sh
+!/.local/bin/suspend.sh
 !/.local/bin/screenshot.sh
 !/.local/bin/reddit-wallpaper.sh
 !/.local/bin/temp-monitor.sh
