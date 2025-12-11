@@ -109,8 +109,7 @@ alias \
     fd="fd -IH" \
     rg="rg -IH" \
     wcp="wl-copy" \
-    rsync="rsync -av --info=progress2" \
-    suspend="systemctl suspend"
+    rsync="rsync -av --info=progress2" 
 
 # Shortcuts
 alias \
@@ -121,6 +120,7 @@ alias \
     cf="cd ${HOME}/.config" \
     cfz="\$EDITOR ${ZDOTDIR}/.zshrc" \
     cfb="\$EDITOR ${HOME}/.bashrc" \
+    cfv="cd ${HOME}/.config/nvim && \$EDITOR ${HOME}/.config/nvim" \
     repo="cd ${HOME}/source/repos" \
     rice="cd ${HOME}/.local/share/ricing"
 
