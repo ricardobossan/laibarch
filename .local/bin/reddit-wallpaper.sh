@@ -22,6 +22,19 @@ if [ "$1" = "default" ]; then
     exit 0
 fi
 
+# Check for 'clear' argument to remove wallpaper (black screen)
+if [ "$1" = "clear" ]; then
+    echo "Clearing wallpaper to black screen..."
+    if command -v swww &> /dev/null; then
+        swww clear 000000
+        echo "Wallpaper cleared successfully"
+    else
+        echo "ERROR: swww not found"
+        exit 1
+    fi
+    exit 0
+fi
+
 # Function to log messages
 log() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$LOG_FILE"
