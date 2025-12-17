@@ -15,7 +15,7 @@ dbus-update-activation-environment WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP
 kanshi &
 
 # Configure displays
-~/.local/bin/configure-displays.sh
+configure-displays.sh &
 
 # Start notification daemon
 mako &
