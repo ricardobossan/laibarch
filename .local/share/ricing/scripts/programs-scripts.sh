@@ -101,11 +101,28 @@ echo ""
 
 # yt-x
 echo "Installing yt-x youtube viewer/downloader browser..."
-if command -v brave &>/dev/null; then
+if command -v yt-x &>/dev/null; then
   echo "yt-x already installed, skipping..."
 else
   yay yt-x --noconfirm
   echo "yt-x installed successfully!"
+fi
+echo ""
+
+# lazysql
+echo "Installing lazysql youtube viewer/downloader browser..."
+if command -v lazysql &>/dev/null; then
+  echo "lazysql already installed, skipping..."
+else
+  # Remove incomplete installation if it exists
+  [ -d "$REPOS/lazysql" ] && rm -rf "$REPOS/lazysql"
+
+  cd "$REPOS"
+  git clone https://aur.archlinux.org/lazysql.git
+  cd lazysql
+  makepkg -si
+
+  echo "lazysql installed successfully!"
 fi
 echo ""
 
