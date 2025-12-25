@@ -10,6 +10,7 @@ return {
         mode = { "n", "v" },
         { "<leader>o", group = "obsidian" },
         { "<leader>c", group = "code" },
+        { "<leader>D", group = "database" },
       },
     },
   },
