@@ -4,6 +4,8 @@
 
 My Arch Linux rice. DWL window manager, LUKS encryption, automated installation.
 
+📖 **[User Guide](.local/share/ricing/USER-GUIDE.md)** - Essential keyboard shortcuts and system usage
+
 ## Quick Install
 
 ### 1. Create ISO
