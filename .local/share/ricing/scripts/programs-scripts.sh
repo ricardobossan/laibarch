@@ -99,6 +99,16 @@ else
 fi
 echo ""
 
+# bluetuith
+echo "Installing bluetuith (TUI Bluetooth manager)..."
+if command -v bluetuith &>/dev/null; then
+  echo "bluetuith already installed, skipping..."
+else
+  yay -S bluetuith --noconfirm
+  echo "bluetuith installed successfully!"
+fi
+echo ""
+
 # yt-x
 echo "Installing yt-x youtube viewer/downloader browser..."
 if command -v yt-x &>/dev/null; then

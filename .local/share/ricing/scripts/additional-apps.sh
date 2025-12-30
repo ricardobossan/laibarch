@@ -13,6 +13,7 @@ cat <<'EOF'
 
 This will install:
   - Steam (via Flatpak with XWayland)
+  - Slack
 
 EOF
 

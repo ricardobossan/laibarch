@@ -66,6 +66,12 @@ sudo systemctl enable --now NetworkManager && echo "  ✓ NetworkManager"
 sudo systemctl enable --now systemd-resolved && echo "  ✓ systemd-resolved"
 sudo systemctl enable --now iwd && echo "  ✓ iwd"
 
+# Bluetooth services
+sudo systemctl enable --now bluetooth && echo "  ✓ bluetooth"
+
+# Configure Bluetooth to auto-power-on
+sudo sed -i 's/#AutoEnable=true/AutoEnable=true/' /etc/bluetooth/main.conf && echo "  ✓ bluetooth auto-enable configured"
+
 # Mirror list updater
 sudo systemctl enable --now reflector && echo "  ✓ reflector"
 
