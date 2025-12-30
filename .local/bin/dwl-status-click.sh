@@ -103,4 +103,26 @@ datetime)
     ;;
   esac
   ;;
+bluetooth)
+  case "$button" in
+  1) # Left click - open bluetuith
+    bt_power=$(bluetoothctl show 2>/dev/null | grep "Powered:" | awk '{print $2}')
+    bt_devices=$(bluetoothctl devices 2>/dev/null | wc -l)
+    bt_connected=$(bluetoothctl devices Connected 2>/dev/null)
+    if [ -n "$bt_connected" ]; then
+      bt_info="Power: $bt_power\nPaired devices: $bt_devices\n\nConnected:\n$bt_connected"
+    else
+      bt_info="Power: $bt_power\nPaired devices: $bt_devices\n\nNo devices connected"
+    fi
+    notify-send "Bluetooth Status" "$bt_info"
+    ;;
+  3) # Right click - show bluetooth info
+    if command -v bluetuith >/dev/null 2>&1; then
+      alacritty -e bluetuith &
+    else
+      notify-send "Bluetooth" "bluetuith not installed"
+    fi
+    ;;
+  esac
+  ;;
 esac
