@@ -85,3 +85,6 @@ display_bitrate = "yes"
 follow_now_playing_lyrics = "yes"
 ignore_leading_the = "yes"
 empty_tag_marker = ""
+
+## Startup ##
+startup_screen = "playlist_editor"

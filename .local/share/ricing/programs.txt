@@ -30,7 +30,9 @@ base-devel
 pkg-config
 mupdf
 mpv
-ncmcpp
+mpd
+mpc
+ncmpcpp
 yazi
 calcurse
 pass

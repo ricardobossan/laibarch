@@ -197,6 +197,11 @@ static const Key keys[] = {
 	/* Screen power management using wlr-randr */
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Escape,     spawn,          SHCMD("wlr-randr | grep '^[A-Z]' | awk '{print $1}' | xargs -I {} wlr-randr --output {} --off") },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_O,          spawn,          SHCMD("wlr-randr | grep '^[A-Z]' | awk '{print $1}' | xargs -I {} wlr-randr --output {} --on") },
+	/* MPD playback controls */
+	{ MODKEY,                    XKB_KEY_p,          spawn,          SHCMD("mpc toggle") },
+	{ MODKEY,                    XKB_KEY_bracketleft, spawn,         SHCMD("mpc prev") },
+	{ MODKEY,                    XKB_KEY_bracketright, spawn,        SHCMD("mpc next") },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_M,          spawn,          SHCMD("alacritty -e ncmpcpp") },
 	TAGKEYS(          XKB_KEY_1, XKB_KEY_exclam,                     0),
 	TAGKEYS(          XKB_KEY_2, XKB_KEY_at,                         1),
 	TAGKEYS(          XKB_KEY_3, XKB_KEY_numbersign,                 2),
