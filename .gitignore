@@ -21,6 +21,12 @@
 !.config/systemd/user/
 !.config/systemd/user/*.service
 !.config/systemd/user/*.timer
+!.config/mpd/
+!.config/mpd/playlists/
+!.config/mpd/playlists/**/*
+!.config/ncmpcpp/
+!.config/ncmpcpp/*
+.config/ncmpcpp/error.log
 !.zshenv
 !.gitmodules
 !.local
