@@ -22,6 +22,7 @@
 !.config/systemd/user/*.service
 !.config/systemd/user/*.timer
 !.config/mpd/
+!.config/mpd/mpd.conf
 !.config/mpd/playlists/
 !.config/mpd/playlists/**/*
 !.config/ncmpcpp/
