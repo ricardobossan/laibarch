@@ -4,6 +4,7 @@
 !.bashrc
 !.gitignore
 !.config/
+!.config/mimeapps.list
 !.config/nvim/
 !.config/nvim/**/*
 .config/nvim/spell/*
