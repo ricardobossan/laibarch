@@ -269,6 +269,12 @@ echo "Installing additional programs from source..."
 sudo -u "$NEW_USER" HOME="/home/$NEW_USER" bash "$SCRIPT_DIR/scripts/programs-scripts.sh"
 echo ""
 
+# Enable MPD user service
+echo "Enabling MPD service for $NEW_USER..."
+sudo -u "$NEW_USER" XDG_RUNTIME_DIR="/run/user/$(id -u $NEW_USER)" systemctl --user
+enable mpd.service
+echo ""
+
 # Run additional-apps as the new user (with proper HOME)
 echo "Optional additional applications..."
 sudo -u "$NEW_USER" HOME="/home/$NEW_USER" bash "$SCRIPT_DIR/scripts/additional-apps.sh"
