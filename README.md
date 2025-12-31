@@ -176,3 +176,7 @@ Detailed documentation in [.local/share/ricing/README.md]:
 - Safe for public sharing
 
 Tested on VMs and hardware. Contributions welcome!
+
+---
+
+*Laibarch name and mascot are inspired by Laibach. Not affiliated. Original artwork rights belong to their respective owners.*

@@ -68,3 +68,4 @@
 !system-config/**/*
 !README.md
 **/.claude
+!LICENSE
