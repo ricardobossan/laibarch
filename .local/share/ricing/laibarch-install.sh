@@ -29,6 +29,26 @@ This will run the complete installation:
   (After reboot, run this script again for Phase 2)
 
 EOF
+
+  # Check if running from under /mnt
+  if [[ "$SCRIPT_DIR" == /mnt/* ]]; then
+    cat <<'EOF'
+WARNING: Script is running from /mnt/* path
+
+The installation process will mount the new system to /mnt, which will
+hide your current mount point and cause the script to fail.
+
+SOLUTION: Mount your installation media outside /mnt and run from there.
+
+Example:
+  mkdir /pendrive
+  mount /dev/mapper/bootstrap /pendrive
+  bash /pendrive/laibarch/.local/share/ricing/laibarch-install.sh
+
+EOF
+    exit 1
+  fi
+
   read -p "Continue with Phase 1? (y/n): " CONTINUE
   if [ "$CONTINUE" != "y" ]; then
     exit 0
@@ -149,12 +169,6 @@ echo ""
 echo "Step 1: User setup"
 echo "--------------------------------"
 
-# Ensure i2c group exists (needed for ddcutil external monitor brightness)
-if ! getent group i2c >/dev/null; then
-  echo "Creating i2c group..."
-  groupadd i2c
-fi
-
 read -p "Enter username: " NEW_USER
 
 if [ -z "$NEW_USER" ]; then
@@ -182,12 +196,10 @@ if id "$NEW_USER" &>/dev/null; then
     passwd "$NEW_USER"
   fi
 
-  # Ensure user is in i2c group (for ddcutil external monitor brightness)
-  usermod -aG i2c "$NEW_USER" 2>/dev/null
 else
-  # Create new user with home directory, add to wheel and i2c groups, set bash as shell
+  # Create new user with home directory, add to wheel group, set bash as shell
   echo "Creating user $NEW_USER..."
-  useradd -mG wheel,i2c -s /bin/bash "$NEW_USER"
+  useradd -mG wheel -s /bin/bash "$NEW_USER"
 
   # Set password for new user
   echo "Set password for user $NEW_USER:"
@@ -263,6 +275,12 @@ sudo -u "$NEW_USER" HOME="/home/$NEW_USER" bash "$SCRIPT_DIR/scripts/bootstrap.s
 # Change user's default shell to zsh (now that it's installed)
 echo "Setting zsh as default shell for $NEW_USER..."
 chsh -s /bin/zsh "$NEW_USER"
+
+# Add user to i2c group if it exists (created by udev/ddcutil installation)
+if getent group i2c >/dev/null; then
+  echo "Adding $NEW_USER to i2c group for external monitor brightness control..."
+  usermod -aG i2c "$NEW_USER"
+fi
 
 # Run programs-scripts as the new user (with proper HOME)
 echo "Installing additional programs from source..."
