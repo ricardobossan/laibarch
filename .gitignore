@@ -57,12 +57,6 @@
 !.local/src/slstatus/**
 !.local/src/slstatus/**/*
 .local/src/slstatus/config.h
-# Build artifacts
-*.o
-*.orig
-*.rej
-.local/src/slstatus/slstatus
-.local/src/dwl/inst.log
 !system-config
 !system-config/**
 !system-config/**/*
