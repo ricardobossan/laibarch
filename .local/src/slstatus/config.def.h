@@ -73,6 +73,6 @@ static const struct arg args[] = {
     { run_command,      "^wnetwork^^c#98C379^📶 %s ",           "nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d':' -f2 | head -1" },
     { run_command,      "(%s%%) │ ",                            "nmcli -t -f in-use,signal dev wifi | grep '^\\*' | cut -d':' -f2" },
     { battery_perc,     "^wbattery^^c#56B6C2^🔋 %s%% │ ",       "BAT0" },
-    { run_command,      "^wbluetooth^^c#61AFEF^󰂯 %s │ ",    "bluetoothctl show 2>/dev/null | grep -q 'Powered: yes' && (bluetoothctl devices Connected 2>/dev/null | head -1 | cut -d' ' -f3- | head -c 15 || echo 'On') || echo 'Off'" },
+    { run_command,      "^wbluetooth^^c#61AFEF^󰂯 %s │ ",    "timeout 0.5 bluetoothctl show 2>/dev/null | grep -q 'Powered: yes' && (timeout 0.5 bluetoothctl devices Connected 2>/dev/null | head -1 | cut -d' '-f3- | head -c 15 || echo 'On') || echo 'Off'" },
     { datetime,         "^wdatetime^^c#D19A66^⏰ %s",           "%a %b %d %l:%M %p" },
 };
