@@ -43,5 +43,6 @@ swayidle -w \
   before-sleep 'swaylock -f' &
 
 # Auto-adjust color temperature based on time of day
-# Using gammastep with automatic location detection via geoclue2
-gammastep -l geoclue2 -t 6500:2600 &
+# Using IP-based geolocation from BeaconDB API
+(LAT_LNG=$(curl -s "https://api.beacondb.net/v1/geolocate" -d '{}' -H "Content-Type: application/json" | grep -oP '"lat":\K-?[0-9.]+|"lng":\K-?[0-9.]+' | tr '\n' ':' | sed 's/:$//')
+gammastep -l $LAT_LNG -t 6500:2600) &
