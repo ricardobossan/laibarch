@@ -100,12 +100,16 @@ This is a **home directory git repository**. The entire `$HOME` is tracked with 
 - **Languages**: C#, Node.js, Python
 - **Tools**: Git, GitHub CLI, Lazygit, sqlit, lazysql
 
+![Debugging C# in Neovim](./.local/share/laibarch-neovim.png)
+
 ### Applications
 
 - **Browser**: Brave
-- **Media**: mpv, mupdf, zathura, yazi
-- **Utils**: Obsidian, Syncthing, Calcurse
+- **Media**: mpv, mupdf, ncmpcpp
+- **Utils**: Obsidian, Syncthing, Calcurse, yazi
 - **AUR**: yay (built during install)
+
+![Laibarch apps](./.local/share/laibarch-apps.png)
 
 ### Optional (Phase 2 prompts)
 

@@ -32,7 +32,7 @@
 !.gitmodules
 !.local
 !.local/share/
-!.local/share/laibarch.png
+!.local/share/laibarch*.png
 !.local/share/ricing
 !.local/share/ricing/**
 !.local/share/ricing/**/*
