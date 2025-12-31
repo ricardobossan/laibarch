@@ -287,10 +287,11 @@ echo "Installing additional programs from source..."
 sudo -u "$NEW_USER" HOME="/home/$NEW_USER" bash "$SCRIPT_DIR/scripts/programs-scripts.sh"
 echo ""
 
-# Enable MPD user service
+# Enable MPD user service (manual symlink to avoid needing active user session)
 echo "Enabling MPD service for $NEW_USER..."
-sudo -u "$NEW_USER" XDG_RUNTIME_DIR="/run/user/$(id -u $NEW_USER)" systemctl --user
-enable mpd.service
+mkdir -p /home/$NEW_USER/.config/systemd/user/default.target.wants
+ln -sf /usr/lib/systemd/user/mpd.service /home/$NEW_USER/.config/systemd/user/default.target.wants/mpd.service
+chown -R $NEW_USER:$NEW_USER /home/$NEW_USER/.config
 echo ""
 
 # Run additional-apps as the new user (with proper HOME)
