@@ -7,13 +7,16 @@ Quick reference for using your Laibarch system.
 **MODKEY** = Super/Windows key
 
 ### Applications
+
 - `Super+Enter` - Terminal
 - `Super+Shift+D` - Application launcher
 - `Super+V` - Clipboard history
 - `Super+W` - Web browser
 - `Super+Shift+M` - Music player
+- `Middle-click mouse on dwl bar` - Terminal
 
 ### Window Management
+
 - `Super+Q` - Close window
 - `Super+J/K` - Navigate windows
 - `Super+H/L` - Resize windows
@@ -21,10 +24,12 @@ Quick reference for using your Laibarch system.
 - `Super+Tab` - Last workspace
 
 ### Workspaces
+
 - `Super+[1-9]` - Switch workspace
 - `Super+Shift+[1-9]` - Move window to workspace
 
 ### Media Controls
+
 - `Super+P` - Play/pause music
 - `Super+[` - Previous track
 - `Super+]` - Next track
@@ -32,10 +37,12 @@ Quick reference for using your Laibarch system.
 - `Super+Shift++/_` - Brightness up/down
 
 ### Screenshots
+
 - `Super+Shift+S` - Select area (saved + clipboard)
 - `Super+Shift+P` - Fullscreen (saved)
 
 ### Power
+
 - `Super+Shift+Escape` - Turn off displays
 - `Super+Shift+O` - Turn on displays
 - `Super+Shift+Q` - Logout
@@ -43,6 +50,7 @@ Quick reference for using your Laibarch system.
 ## Music Player (ncmpcpp)
 
 Navigate with vim keys: `h/j/k/l`
+
 - `/` - Search forward
 - `?` - Search backward
 - `Space` - Play/pause
@@ -51,14 +59,17 @@ Navigate with vim keys: `h/j/k/l`
 ## System Configuration
 
 Config locations:
+
 - DWL keybindings: `~/.local/src/dwl/config.def.h`
 - Shell: `~/.config/zsh/.zshrc`
 - Terminal: `~/.config/alacritty/alacritty.toml`
 - Music: `~/.config/ncmpcpp/config`
 
 After editing DWL config, rebuild:
+
 ```bash
 cd ~/.local/src/dwl
 yes | rm config.h && sudo make install
 ```
+
 Then logout and login.

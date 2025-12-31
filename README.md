@@ -1,6 +1,8 @@
 # Laibarch
 
-~Life~ Arch is Life!
+~~Life~~ Arch is Life!
+
+![Laibarch mascot](./.local/share/laibarch.png)
 
 My Arch Linux rice. DWL window manager, LUKS encryption, automated installation.
 
@@ -9,11 +11,13 @@ My Arch Linux rice. DWL window manager, LUKS encryption, automated installation.
 ## Quick Install
 
 ### 1. Create ISO
+
 ```bash
 bash .local/share/ricing/create-repo-iso.sh
 ```
 
 ### 2. Boot & Install (from Arch Live ISO)
+
 ```bash
 mount /dev/sr0 /mnt/repo  # or sr1, check with lsblk
 bash /mnt/repo/.local/share/ricing/laibarch-install.sh
@@ -22,6 +26,7 @@ bash /mnt/repo/.local/share/ricing/laibarch-install.sh
 **Phase 1** (auto-detected): Partitioning, LUKS encryption, base system, bootloader.
 
 ### 3. After Reboot (login as root)
+
 ```bash
 mount /dev/sr0 /mnt/repo
 bash /mnt/repo/.local/share/ricing/laibarch-install.sh
@@ -35,13 +40,19 @@ Reboot and DWL starts automatically.
 
 ## Features
 
+- **Automated** from bare metal to working system in [two phases](.local/share/ricing/README.md)
 - **Full disk encryption** with LUKS
 - **DWL** Wayland compositor with custom bar patch
-- **iwd** network backend (NetworkManager uses iwd)
 - **Wayland-native** stack (no X11 dependencies except slstatus)
-- **Brightness control** works on laptops (brightnessctl) and desktops (ddcutil/DDC-CI)
-- **Temperature monitoring** shows highest temp across all sensors (CPU/GPU/NVMe)
-- **Automated** from bare metal to working system in two phases
+- **Status bar with clickable widgets** for:
+  - Temperature
+  - volume
+  - network
+  - battery
+  - bluetooth
+  - calendar
+- **TUI applications** predominance (lazygit, neovim, sqlit, etc)
+- **Blue light filter** with automatic geolocation (geoclue + gammastep)
 
 ## Repository Structure
 
@@ -76,24 +87,28 @@ This is a **home directory git repository**. The entire `$HOME` is tracked with 
 ## What Gets Installed
 
 ### Core System
-- **Window Manager**: DWL (Wayland) with custom bar
+
+- **Window Manager**: DWL (Wayland) with custom bar (clickable widgets)
 - **Terminal**: Alacritty + Tmux (auto-starts)
 - **Shell**: Zsh (default) + Bash (fallback)
 - **Network**: iwd + NetworkManager (iwd backend)
 - **Audio**: PipeWire + WirePlumber
 
 ### Development
+
 - **Editor**: Neovim 0.10.4 (from binary)
-- **Languages**: Rust, Node.js, Python
-- **Tools**: Git, GitHub CLI, Lazygit, CMake, base-devel
+- **Languages**: C#, Node.js, Python
+- **Tools**: Git, GitHub CLI, Lazygit, sqlit, lazysql
 
 ### Applications
+
 - **Browser**: Brave
 - **Media**: mpv, mupdf, zathura, yazi
 - **Utils**: Obsidian, Syncthing, Calcurse
 - **AUR**: yay (built during install)
 
 ### Optional (Phase 2 prompts)
+
 - **Gaming**: Steam (Flatpak), Slack (AUR)
 
 See `programs.txt` for complete list (93 packages).
@@ -101,18 +116,23 @@ See `programs.txt` for complete list (93 packages).
 ## Hardware Support
 
 ### Brightness Control
+
 Works on both laptops and desktops:
+
 - **Laptops**: Uses `brightnessctl` (built-in backlight)
 - **Desktops**: Uses `ddcutil` (DDC/CI protocol for external monitors)
 - Keybindings: `MODKEY+Shift+-` / `MODKEY+Shift+=`
 
 ### Temperature Monitoring
+
 Shows highest temperature across all devices:
+
 - **Desktop**: Monitors CPU (k10temp), GPU (amdgpu), NVMe
 - **Laptop**: Falls back to ACPI thermal zones
 - Click widget for detailed temps
 
 ### Tested On
+
 - VMs (libvirt/QEMU with `/dev/vda`)
 - NVMe systems (`/dev/nvme0n1`)
 - SATA systems (`/dev/sda`)
@@ -122,6 +142,7 @@ Shows highest temperature across all devices:
 ## Post-Installation
 
 After laibarch installation completes, the system is fully functional with:
+
 - ✅ DWL compositor running
 - ✅ Network connected (WiFi credentials persist)
 - ✅ All services enabled
@@ -131,16 +152,16 @@ After laibarch installation completes, the system is fully functional with:
 ### Optional Next Steps
 
 You may want to add:
+
 - SSH/GPG keys for git access
 - Personal dotfiles and configs
 - Password managers and secret storage
 - Additional applications
 
-**Keep private configs separate** from this public repository.
-
 ## Documentation
 
-Detailed documentation in `.local/share/ricing/README.md`:
+Detailed documentation in [.local/share/ricing/README.md]:
+
 - Installation workflow details
 - Script descriptions
 - VM vs hardware setup
@@ -153,6 +174,5 @@ Detailed documentation in `.local/share/ricing/README.md`:
 - Auto-login enabled after LUKS unlock (convenience)
 - No hardcoded credentials
 - Safe for public sharing
-- Private configs kept separate
 
 Tested on VMs and hardware. Contributions welcome!
