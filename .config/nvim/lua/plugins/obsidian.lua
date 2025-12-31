@@ -21,6 +21,7 @@ return {
     -- see below for full list of optional dependencies 👇
   },
   opts = {
+    -- NOTE: Customize workspace names and paths for your Obsidian vaults
     workspaces = {
       {
         name = "Zettelkasten",
