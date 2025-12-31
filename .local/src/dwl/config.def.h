@@ -237,4 +237,5 @@ static const Button buttons[] = {
 	{ ClkTagBar,   0,      BTN_RIGHT,  toggleview,        {0} },
 	{ ClkTagBar,   MODKEY, BTN_LEFT,   tag,               {0} },
 	{ ClkTagBar,   MODKEY, BTN_RIGHT,  toggletag,         {0} },
+	{ ClkRoot,     0,      BTN_MIDDLE, spawn,             {.v = termcmd} },
 };
