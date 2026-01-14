@@ -24,7 +24,6 @@
 !.config/mpd/
 !.config/mpd/mpd.conf
 !.config/mpd/playlists/
-!.config/mpd/playlists/**/*
 !.config/ncmpcpp/
 !.config/ncmpcpp/*
 .config/ncmpcpp/error.log
