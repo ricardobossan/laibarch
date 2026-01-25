@@ -1,0 +1,21 @@
+#!/usr/bin/bash
+
+cd "$HOME/.local/src/dwl/"
+
+git checkout "$1"
+
+case "$1" in
+"master" | "game")
+  echo "Switching to branch $1"
+  ;;
+*)
+  echo "Wrong branch name. Should be either 'master' or 'game'"
+  exit
+  ;;
+esac
+
+rm config.h
+make && sudo make clean install
+
+echo "Switched to $1 branch and built dwl accordingly."
+echo "Press MODKEY + Shift + Q to exit dwl, then type 'exit' and hit ENTER to log back to the newly built dwl session"

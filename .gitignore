@@ -47,6 +47,7 @@
 !/.local/bin/steam
 !/.local/bin/xsteam
 !/.local/bin/yts
+!/.local/bin/change-profile
 !.local/src/
 !.local/src/dwl
 !.local/src/dwl/**
