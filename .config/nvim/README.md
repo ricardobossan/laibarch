@@ -37,6 +37,7 @@ This workflow ensures you control when plugins update and can always rollback to
 Refer to the [LazyVim documentation](https://lazyvim.github.io/installation) for setup basics.
 
 After cloning this config:
+
 1. Plugins will auto-install at pinned versions from `lockfile-pins.lua`
 2. Mason LSP servers will auto-install (or run `:Mason` to manage manually)
 3. No manual `:Lazy restore` needed - pins ensure correct versions
