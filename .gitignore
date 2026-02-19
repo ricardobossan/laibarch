@@ -35,6 +35,8 @@
 !.local/share/ricing
 !.local/share/ricing/**
 !.local/share/ricing/**/*
+!.local/share/applications/
+!.local/share/applications/tremc.desktop
 !.local/bin/
 !.local/bin/configure-displays.sh
 !.local/bin/dwl-autostart.sh

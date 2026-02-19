@@ -40,3 +40,5 @@ application/xhtml+xml=brave-browser.desktop
 
 # File manager
 inode/directory=yazi.desktop
+application/x-bittorrent=tremc.desktop
+x-scheme-handler/magnet=tremc.desktop

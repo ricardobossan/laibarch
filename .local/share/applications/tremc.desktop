@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Tremc
+Comment=Add torrent to Transmission daemon
+Exec=transmission-remote --add %u
+Icon=transmission
+NoDisplay=false
+MimeType=application/x-bittorrent;x-scheme-handler/magnet;
+Categories=Network;FileTransfer;P2P;
