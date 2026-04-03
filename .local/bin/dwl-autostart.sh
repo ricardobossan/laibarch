@@ -28,10 +28,13 @@ wl-clip-persist --clipboard both &
 # Auto-mount removable drives
 udiskie &
 
-swww-daemon --no-cache &
+awww-daemon --no-cache &
 
 # Set wallpaper from Reddit
 ~/.local/bin/reddit-wallpaper.sh &
+
+# Torrent service
+transmission-daemon &
 
 # Idle management - screen blanking and lock
 # Suspend skipped if file transfer (cp/rsync/mv) or torrent daemon running
