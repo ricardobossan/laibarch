@@ -59,7 +59,7 @@ otf-font-awesome
 pulsemixer
 pavucontrol
 wmenu
-swww
+awww
 nwg-displays
 swayimg
 mako

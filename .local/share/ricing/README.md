@@ -128,7 +128,7 @@ Initializes pacman keyring, enables parallel downloads.
 - Terminals: alacritty, foot
 - Shell tools: zsh, zsh-completions, bat, fd, ripgrep, htop, tmux, stow
 - Development: git, github-cli, rust, nodejs, npm, cmake, base-devel
-- Wayland: wlroots, wayland-protocols, wl-clipboard, cliphist, wmenu, swww
+- Wayland: wlroots, wayland-protocols, wl-clipboard, cliphist, wmenu, awww
 - X11 (temporary): libx11, libxft (required for slstatus - will migrate to dwlb)
 - Utilities: mako, grim, slurp, gammastep, geoclue
 - Applications: mpv, mupdf, zathura, yazi, calcurse, obsidian, syncthing
@@ -187,10 +187,12 @@ Device naming: `/dev/nvme0n1` (NVMe) or `/dev/sda` (SATA) - auto-detected
 Works on both laptops and desktops via universal script (`~/.local/bin/brightness.sh`):
 
 **Laptops:**
+
 - Uses `brightnessctl` for built-in backlight
 - Detects `class 'backlight'` devices
 
 **Desktops:**
+
 - Uses `ddcutil` for external monitors (DDC/CI protocol)
 - Requires `i2c-dev` kernel module (auto-loaded)
 - User must be in `i2c` group (auto-configured)
@@ -202,16 +204,19 @@ Keybindings: `MODKEY+Shift+-` / `MODKEY+Shift+=`
 Status bar shows highest temperature across all sensors:
 
 **Detection priority:**
+
 1. `sensors` command (lm_sensors) - reads all hwmon devices
 2. Falls back to `/sys/class/thermal/thermal_zone0/temp` (laptops)
 3. Shows `n/a` if no sensors available
 
 **Desktop systems:**
+
 - k10temp (AMD Ryzen CPU)
 - amdgpu (AMD GPU edge temp)
 - nvme (NVMe SSD)
 
 **Laptop systems:**
+
 - ACPI thermal zones
 
 Click widget shows detailed per-component temperatures.
@@ -221,11 +226,13 @@ Click widget shows detailed per-component temperatures.
 Battery and temperature monitors run as systemd user timers:
 
 **Battery Monitor** (`battery-monitor.timer`):
+
 - Runs every 2 minutes
 - Sends notifications at 20%, 10%, 5% levels
 - Only active on systems with battery
 
 **Temperature Monitor** (`temp-monitor.timer`):
+
 - Runs every 1 minute
 - Sends notification if any sensor exceeds 80°C
 - Works on desktops and laptops
@@ -253,10 +260,12 @@ The terminal stack follows the standard architecture: `Kernel -> DWL -> Alacritt
 ### Components
 
 **Alacritty** (`~/.config/alacritty/alacritty.toml`)
+
 - Terminal emulator (creates PTY, renders text)
 - Minimal config: font size 8.5, 85% opacity, clipboard bindings
 
 **Tmux** (`~/.config/tmux/tmux.conf`)
+
 - Terminal multiplexer (sessions, panes)
 - Prefix: `Ctrl+e` (default `Ctrl+b` unbound)
 - Vim-style pane navigation: `hjkl`
@@ -265,6 +274,7 @@ The terminal stack follows the standard architecture: `Kernel -> DWL -> Alacritt
 - Auto-restore sessions on start
 
 **Shell** (Zsh, with Bash available)
+
 - Zsh is the default login shell (set via `chsh` during installation)
 - Auto-starts tmux when in terminal emulator (checks for `/dev/pts/*`)
 - Vim mode with cursor shape change (block for normal, beam for insert)
@@ -272,19 +282,20 @@ The terminal stack follows the standard architecture: `Kernel -> DWL -> Alacritt
 - Plugins: zsh-autosuggestions, zsh-syntax-highlighting
 
 **Bash/Zsh Relationship:**
+
 - Zsh does NOT read `.bashrc` or `.bash_profile` - they're separate shells
 - `.bashrc` kept for when bash is needed (scripts, emergency)
 - Aliases duplicated in both (may diverge as zsh-specific features added)
 
 ### Configuration Files
 
-| Component | Config Location | Tracked in git |
-|-----------|-----------------|----------------|
-| Alacritty | `~/.config/alacritty/alacritty.toml` | Yes |
-| Tmux | `~/.config/tmux/tmux.conf` | Yes |
-| Zsh | `~/.zshenv`, `~/.config/zsh/.zshrc` | Yes |
-| Zsh plugins | `~/.local/share/zsh/plugins/` | Yes |
-| Bash | `~/.bashrc` | Yes |
+| Component   | Config Location                      | Tracked in git |
+| ----------- | ------------------------------------ | -------------- |
+| Alacritty   | `~/.config/alacritty/alacritty.toml` | Yes            |
+| Tmux        | `~/.config/tmux/tmux.conf`           | Yes            |
+| Zsh         | `~/.zshenv`, `~/.config/zsh/.zshrc`  | Yes            |
+| Zsh plugins | `~/.local/share/zsh/plugins/`        | Yes            |
+| Bash        | `~/.bashrc`                          | Yes            |
 
 ### Behavior Flow
 
@@ -297,11 +308,13 @@ The terminal stack follows the standard architecture: `Kernel -> DWL -> Alacritt
 ### Observations
 
 **Working well:**
+
 - Vim keybindings in tmux
 - Session persistence (resurrect + continuum)
 - Clean separation of concerns
 
 **Potential improvements:**
+
 - Tmux uses `xclip` but system is Wayland -> should use `wl-copy`
 - Many tmux plugins - evaluate which are actually used
 - Zsh will replace bash for better completion and vim mode in shell itself

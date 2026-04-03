@@ -11,20 +11,20 @@ mkdir -p "$WALLPAPER_DIR"
 
 # Check for 'default' argument to apply default wallpaper
 if [ "$1" = "default" ]; then
-    echo "Applying default wallpaper..."
-    if command -v swww &> /dev/null; then
-        swww img "$DEFAULT_WALLPAPER" --resize fit --transition-type fade --transition-duration 2
-        echo "Default wallpaper set successfully"
-    else
-        echo "ERROR: swww not found"
-        exit 1
-    fi
-    exit 0
+  echo "Applying default wallpaper..."
+  if command -v awww &>/dev/null; then
+    awww img "$DEFAULT_WALLPAPER" --resize fit --transition-type fade --transition-duration 2
+    echo "Default wallpaper set successfully"
+  else
+    echo "ERROR: awww not found"
+    exit 1
+  fi
+  exit 0
 fi
 
 # Function to log messages
 log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$LOG_FILE"
+  echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >>"$LOG_FILE"
 }
 
 log "Starting wallpaper fetch from r/earthporn"
@@ -32,12 +32,12 @@ log "Starting wallpaper fetch from r/earthporn"
 # Fetch top posts from r/earthporn (top of the week)
 # Using User-Agent to avoid Reddit blocking
 JSON=$(curl -s -A "linux:earthporn-wallpaper:v1.0 (by /u/wallpaper_script)" \
-    "https://www.reddit.com/r/earthporn/top.json?limit=50&t=week")
+  "https://www.reddit.com/r/earthporn/top.json?limit=50&t=week")
 
 if [ -z "$JSON" ]; then
-    log "ERROR: Failed to fetch data from Reddit, using default wallpaper"
-    swww img "$DEFAULT_WALLPAPER" --resize fit 2>/dev/null
-    exit 1
+  log "ERROR: Failed to fetch data from Reddit, using default wallpaper"
+  awww img "$DEFAULT_WALLPAPER" --resize fit 2>/dev/null
+  exit 1
 fi
 
 # Extract image URLs (filter for direct image links and 4K+ resolution)
@@ -45,9 +45,9 @@ fi
 URLS=$(echo "$JSON" | jq -r '.data.children[].data | select(.post_hint == "image") | select(.preview.images[0].source.width >= 3840) | .url' | grep -E '\.(jpg|png)$|i\.redd\.it')
 
 if [ -z "$URLS" ]; then
-    log "ERROR: No image URLs found, using default wallpaper"
-    swww img "$DEFAULT_WALLPAPER" --resize fit 2>/dev/null
-    exit 1
+  log "ERROR: No image URLs found, using default wallpaper"
+  awww img "$DEFAULT_WALLPAPER" --resize fit 2>/dev/null
+  exit 1
 fi
 
 # Pick a random image from the list
@@ -56,23 +56,23 @@ log "Selected image: $RANDOM_URL"
 
 # Download the image
 if wget -q -O "$CACHE_FILE" "$RANDOM_URL"; then
-    log "Successfully downloaded wallpaper"
+  log "Successfully downloaded wallpaper"
 
-    # Optional: Save to wallpaper collection
-    TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-    cp "$CACHE_FILE" "$WALLPAPER_DIR/reddit_${TIMESTAMP}.jpg"
+  # Optional: Save to wallpaper collection
+  TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+  cp "$CACHE_FILE" "$WALLPAPER_DIR/reddit_${TIMESTAMP}.jpg"
 
-    # Set as wallpaper using swww
-    if command -v swww &> /dev/null; then
-        swww img "$CACHE_FILE" --transition-type fade --transition-duration 2
-        log "Wallpaper set successfully"
-    else
-        log "WARNING: swww not found, wallpaper downloaded but not set"
-    fi
+  # Set as wallpaper using awww
+  if command -v awww &>/dev/null; then
+    awww img "$CACHE_FILE" --transition-type fade --transition-duration 2
+    log "Wallpaper set successfully"
+  else
+    log "WARNING: awww not found, wallpaper downloaded but not set"
+  fi
 else
-    log "ERROR: Failed to download wallpaper from $RANDOM_URL, using default wallpaper"
-    swww img "$DEFAULT_WALLPAPER" --resize fit 2>/dev/null
-    exit 1
+  log "ERROR: Failed to download wallpaper from $RANDOM_URL, using default wallpaper"
+  awww img "$DEFAULT_WALLPAPER" --resize fit 2>/dev/null
+  exit 1
 fi
 
 # Keep only the last 10 wallpapers to save space
