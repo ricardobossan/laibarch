@@ -110,7 +110,8 @@ alias \
     rg="rg -IH" \
     wcp="wl-copy" \
     suspend="systemctl suspend" \
-    rsync="rsync -av --info=progress2"
+    rsync="rsync -av --info=progress2" \
+    tremc="tremc --skip-version-check"
 
 # Shortcuts
 alias \
@@ -125,38 +126,38 @@ alias \
     repo="cd ${HOME}/source/repos" \
     rice="cd ${HOME}/.local/share/ricing"
 
-# -----------------------------------------------------------------------------
-# mupdf wrapper with automatic XWayland management
-# -----------------------------------------------------------------------------
-mupdf() {
-    if [ $# -eq 0 ]; then
-        echo "usage: mupdf [options] file.pdf [page]"
-        return 1
-    fi
-
-    local display_num=":99"
-    local xwayland_pid=""
-    local started_xwayland=false
-
-    # Check if XWayland is already running on our display
-    if ! pgrep -f "Xwayland ${display_num}" >/dev/null; then
-        # Start XWayland in background
-        Xwayland ${display_num} -ac >/dev/null 2>&1 &
-        xwayland_pid=$!
-        started_xwayland=true
-
-        # Wait a bit for XWayland to initialize
-        sleep 0.5
-    fi
-
-    # Run mupdf with the display
-    DISPLAY=${display_num} /usr/bin/mupdf "$@"
-
-    # If we started XWayland, kill it when mupdf exits
-    if [ "$started_xwayland" = true ] && [ -n "$xwayland_pid" ]; then
-        kill $xwayland_pid 2>/dev/null
-    fi
-}
+# # -----------------------------------------------------------------------------
+# # mupdf wrapper with automatic XWayland management
+# # -----------------------------------------------------------------------------
+# mupdf() {
+#     if [ $# -eq 0 ]; then
+#         echo "usage: mupdf [options] file.pdf [page]"
+#         return 1
+#     fi
+#
+#     local display_num=":99"
+#     local xwayland_pid=""
+#     local started_xwayland=false
+#
+#     # Check if XWayland is already running on our display
+#     if ! pgrep -f "Xwayland ${display_num}" >/dev/null; then
+#         # Start XWayland in background
+#         Xwayland ${display_num} -ac >/dev/null 2>&1 &
+#         xwayland_pid=$!
+#         started_xwayland=true
+#
+#         # Wait a bit for XWayland to initialize
+#         sleep 0.5
+#     fi
+#
+#     # Run mupdf with the display
+#     DISPLAY=${display_num} /usr/bin/mupdf "$@"
+#
+#     # If we started XWayland, kill it when mupdf exits
+#     if [ "$started_xwayland" = true ] && [ -n "$xwayland_pid" ]; then
+#         kill $xwayland_pid 2>/dev/null
+#     fi
+# }
 
 # -----------------------------------------------------------------------------
 # Tmux auto-start
