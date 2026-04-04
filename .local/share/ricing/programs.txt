@@ -101,3 +101,4 @@ kanshi
 calc
 bluez
 bluez-utils
+exfatprogs
