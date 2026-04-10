@@ -8,7 +8,6 @@
 !.config/nvim/
 !.config/nvim/**/*
 .config/nvim/spell/*
-!.config/mimeapps.list
 !.config/alacritty/
 !.config/alacritty/alacritty.toml
 !.config/tmux
@@ -27,6 +26,8 @@
 !.config/ncmpcpp/
 !.config/ncmpcpp/*
 .config/ncmpcpp/error.log
+!.config/yazi/
+!.config/yazi/yazi.toml
 !.zshenv
 !.gitmodules
 !.local

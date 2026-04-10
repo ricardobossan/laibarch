@@ -115,14 +115,15 @@ alias \
 
 # Shortcuts
 alias \
-    ric="cd ${HOME}/Documents/ricardo && \${EDITOR} vault-root.md +ObsidianToday" \
-    ether="cd ${HOME}/Documents/mai/ether && \${EDITOR} ether\ \(todos\).md" \
-    bys="cd ${HOME}/Documents/bys && \${EDITOR} ." \
-    docs="cd ${HOME}/Documents/zettelkasten && \${EDITOR} ." \
+    todo="cd ${HOME}/Documents/ricardo/todo" \
+    jobhunt="cd ${HOME}/Documents/ricardo/processo_seletivo" \
+    ric="cd ${HOME}/Documents/ricardo && ${EDITOR} vault-root.md +ObsidianToday" \
+    bys="cd ${HOME}/Documents/bys && ${EDITOR} ." \
+    docs="cd ${HOME}/Documents/zettelkasten && ${EDITOR} ." \
     cf="cd ${HOME}/.config" \
-    cfz="\$EDITOR ${ZDOTDIR}/.zshrc" \
-    cfb="\$EDITOR ${HOME}/.bashrc" \
-    cfv="cd ${HOME}/.config/nvim && \$EDITOR ${HOME}/.config/nvim" \
+    cfz="${EDITOR} ${ZDOTDIR}/.zshrc" \
+    cfb="${EDITOR} ${HOME}/.bashrc" \
+    cfv="cd ${HOME}/.config/nvim && $EDITOR ${HOME}/.config/nvim" \
     repo="cd ${HOME}/source/repos" \
     rice="cd ${HOME}/.local/share/ricing"
 
