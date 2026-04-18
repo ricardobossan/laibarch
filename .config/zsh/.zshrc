@@ -5,6 +5,9 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
+# Source shared environment variables
+[[ -f "$HOME/.config/shell/profile" ]] && source "$HOME/.config/shell/profile"
+
 # -----------------------------------------------------------------------------
 # History
 # -----------------------------------------------------------------------------

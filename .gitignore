@@ -5,6 +5,8 @@
 !.gitignore
 !.config/
 !.config/mimeapps.list
+!.config/shell
+!.config/shell/**/*
 !.config/nvim/
 !.config/nvim/**/*
 .config/nvim/spell/*
