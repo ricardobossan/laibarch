@@ -111,6 +111,19 @@ This is a **home directory git repository**. The entire `$HOME` is tracked with 
 
 ![Laibarch apps](./.local/share/laibarch-apps.png)
 
+### File Associations (MIME Types)
+
+Default applications configured via XDG MIME system in `~/.config/mimeapps.list`:
+
+- **Text/Code**: neovim (all `text/*` types including C#, Python, JSON, Markdown, shell scripts)
+- **PDF**: mupdf
+- **Images**: swayimg
+- **Video/Audio**: mpv
+- **Web**: Brave
+- **File Manager**: yazi
+
+MIME types auto-detect file types by content and extension. To change defaults: edit `~/.config/mimeapps.list` or use `xdg-mime default <app.desktop> <mime/type>`. Yazi respects both XDG defaults and its own rules in `~/.config/yazi/yazi.toml`.
+
 ### Optional (Phase 2 prompts)
 
 - **Gaming**: Steam (Flatpak), Slack (AUR)

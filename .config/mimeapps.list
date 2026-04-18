@@ -4,6 +4,22 @@
 text/plain=nvim.desktop
 text/html=brave-browser.desktop
 text/xml=nvim.desktop
+text/markdown=nvim.desktop
+
+# Source code files
+text/x-csharp=nvim.desktop
+text/x-csrc=nvim.desktop
+text/x-c++src=nvim.desktop
+text/x-chdr=nvim.desktop
+text/x-c++hdr=nvim.desktop
+text/x-python=nvim.desktop
+text/x-shellscript=nvim.desktop
+text/x-rust=nvim.desktop
+text/x-java=nvim.desktop
+text/javascript=nvim.desktop
+application/json=nvim.desktop
+application/xml=nvim.desktop
+application/x-yaml=nvim.desktop
 
 # PDF files
 application/pdf=mupdf.desktop
