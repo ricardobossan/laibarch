@@ -58,3 +58,4 @@ application/xhtml+xml=brave-browser.desktop
 inode/directory=yazi.desktop
 application/x-bittorrent=tremc.desktop
 x-scheme-handler/magnet=tremc.desktop
+x-scheme-handler/claude-cli=claude-code-url-handler.desktop
