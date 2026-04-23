@@ -30,6 +30,7 @@
 .config/ncmpcpp/error.log
 !.config/yazi/
 !.config/yazi/yazi.toml
+!.config/yazi/keymap.toml
 !.zshenv
 !.gitmodules
 !.local
