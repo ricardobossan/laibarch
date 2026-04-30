@@ -10,3 +10,5 @@ export XKB_DEFAULT_VARIANT=intl
 
 # PATH
 export PATH="$PATH:${HOME}/.local/bin:${HOME}/.cargo/bin:${HOME}/.dotnet/tools"
+
+export ANTHROPIC_API_KEY="$(pass show ai/ANTHROPIC_API_KEY)"
