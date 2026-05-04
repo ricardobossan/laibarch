@@ -20,7 +20,6 @@ ueberzug_scale = 1
 ueberzug_offset_x = 0
 ueberzug_offset_y = 0
 
-# Force ueberzugpp
 [adapter]
 use = "ueberzug"
 

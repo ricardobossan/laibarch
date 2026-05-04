@@ -17,27 +17,4 @@ return {
     },
     keys = {},
   },
-  -- wire minuet into blink.cmp
-  {
-    "saghen/blink.cmp",
-    opts = {
-      sources = {
-        default = {
-          "lsp",
-          "path",
-          "snippets",
-          "buffer" --[[, "minuet"]],
-        },
-        providers = {
-          minuet = {
-            name = "minuet",
-            module = "minuet.blink",
-            async = true,
-            timeout_ms = 8000,
-            score_offset = 50,
-          },
-        },
-      },
-    },
-  },
 }

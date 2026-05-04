@@ -119,7 +119,7 @@ alias \
 # Shortcuts
 alias \
     todo="cd ${HOME}/Documents/ricardo/todo" \
-    jobhunt="cd ${HOME}/Documents/ricardo/processo_seletivo" \
+    jh="cd ${HOME}/Documents/ricardo/processo_seletivo" \
     ric="cd ${HOME}/Documents/ricardo && ${EDITOR} vault-root.md +ObsidianToday" \
     bys="cd ${HOME}/Documents/bys && ${EDITOR} ." \
     docs="cd ${HOME}/Documents/zettelkasten && ${EDITOR} ." \
