@@ -2,7 +2,7 @@
 size = 12.5
 
 [window]
-opacity = 0.85
+opacity = 0.92
 
 [selection]
 save_to_clipboard = true
