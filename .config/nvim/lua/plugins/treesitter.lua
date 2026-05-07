@@ -6,6 +6,9 @@ return {
       -- Force compilation from source instead of downloading pre-built parsers
       -- This prevents issues when pre-built tarballs are corrupted or unavailable
       require("nvim-treesitter.install").prefer_git = true
+
+      vim.treesitter.language.register("c_sharp", "csharp")
+
       return opts
     end,
   },
