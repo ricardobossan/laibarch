@@ -63,6 +63,8 @@
 !.local/src/slstatus/**
 !.local/src/slstatus/**/*
 .local/src/slstatus/config.h
+!.links
+!.links/*cfg
 # Build artifacts
 *.o
 *.orig
