@@ -102,3 +102,5 @@ calc
 bluez
 bluez-utils
 exfatprogs
+imv
+xlinks
