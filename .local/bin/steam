@@ -1,20 +1,23 @@
 #!/bin/sh
+# Steam launcher using dwl's built-in XWayland
+#
+# Use this for games with input issues under native Wayland or Gamescope.
+# Known problematic games:
+# - Euro Truck Simulator 2
+# - American Truck Simulator
+# - Caves of Qud (Proton 7)
+# - Other older titles with poor Wayland support
+#
+# Requires dwl built with XWAYLAND support (-DXWAYLAND in config.mk).
+# dwl starts XWayland lazily on first X11 client connection and sets DISPLAY.
+# This gives proper keyboard/input routing via the compositor's seat management.
+#
+# For most games, use 'steam' (Gamescope) instead for better performance.
 
-# Steam launcher using Gamescope compositor
-#
-# Advantages over plain XWayland:
-# - Better frame pacing and VSync handling
-# - Built-in FSR upscaling support
-# - Seamless alt-tab (no mode switching)
-# - Proper cursor confinement
-#
-# For games with mouse/input issues (e.g., Euro Truck Simulator 2),
-# use 'xsteam' instead which runs through XWayland.
-#
-# Options:
-#   --backend sdl        Use SDL backend (more stable than Wayland)
-#   --force-grab-cursor  Ensure proper mouse capture
-#   -W 2560 -H 1080      Resolution (adjust to your display)
-#   -f                   Fullscreen
+if [ -z "$DISPLAY" ]; then
+  echo "xsteam: DISPLAY is not set. Make sure dwl is running with XWayland support (-DXWAYLAND)." >&2
+  echo "xsteam: Restart dwl (the new build has XWayland enabled) and try again." >&2
+  exit 1
+fi
 
-gamescope --backend sdl --force-grab-cursor -W 2560 -H 1080 -f -- flatpak run com.valvesoftware.Steam "$@"
+flatpak run com.valvesoftware.Steam "$@"
