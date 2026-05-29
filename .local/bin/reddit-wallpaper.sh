@@ -27,27 +27,87 @@ log() {
   echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >>"$LOG_FILE"
 }
 
+fetch_unsplash() {
+  local key
+  key="$(pass show _api/UNSPLASH_ACCESS_KEY 2>/dev/null)"
+  if [ -z "$key" ]; then
+    log "ERROR: Could not retrieve Unsplash key from pass, using default wallpaper"
+    awww img "$DEFAULT_WALLPAPER" --resize fit 2>/dev/null
+    return 1
+  fi
+  log "Fetching nature wallpaper from Unsplash"
+  UNSPLASH_JSON=$(curl -s \
+    -H "Authorization: Client-ID $key" \
+    "https://api.unsplash.com/topics/nature/photos?per_page=30&orientation=landscape&order_by=popular")
+  UNSPLASH_URL=$(echo "$UNSPLASH_JSON" | jq -r '.[].urls.raw' 2>/dev/null | shuf -n 1)
+  if [ -z "$UNSPLASH_URL" ] || [ "$UNSPLASH_URL" = "null" ]; then
+    log "ERROR: Failed to fetch Unsplash image, using default wallpaper"
+    awww img "$DEFAULT_WALLPAPER" --resize fit 2>/dev/null
+    return 1
+  fi
+  UNSPLASH_URL="${UNSPLASH_URL}&w=3840&fm=jpg&q=85&fit=max"
+  log "Selected Unsplash image: $UNSPLASH_URL"
+  if wget -q -O "$CACHE_FILE" "$UNSPLASH_URL"; then
+    TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+    cp "$CACHE_FILE" "$WALLPAPER_DIR/unsplash_${TIMESTAMP}.jpg"
+    awww img "$CACHE_FILE" --transition-type fade --transition-duration 2
+    log "Unsplash wallpaper set successfully"
+  else
+    log "ERROR: Failed to download Unsplash image, using default wallpaper"
+    awww img "$DEFAULT_WALLPAPER" --resize fit 2>/dev/null
+    return 1
+  fi
+}
+
 log "Starting wallpaper fetch from r/earthporn"
 
-# Fetch top posts from r/earthporn (top of the week)
-# Using User-Agent to avoid Reddit blocking
-JSON=$(curl -s -A "linux:earthporn-wallpaper:v1.0 (by /u/wallpaper_script)" \
-  "https://www.reddit.com/r/earthporn/top.json?limit=50&t=week")
+# Load Reddit OAuth credentials from pass
+CLIENT_ID="$(pass show _api/REDDIT_CLIENT_ID 2>/dev/null)"
+CLIENT_SECRET="$(pass show _api/REDDIT_CLIENT_SECRET 2>/dev/null)"
+
+if [ -z "$CLIENT_ID" ] || [ -z "$CLIENT_SECRET" ]; then
+  log "ERROR: Could not retrieve Reddit credentials from pass, falling back to Unsplash"
+  fetch_unsplash
+  exit $?
+fi
+
+# Obtain OAuth token (client credentials grant — no user login needed for public data)
+TOKEN=$(curl -s \
+  -u "$CLIENT_ID:$CLIENT_SECRET" \
+  -d "grant_type=client_credentials" \
+  -A "linux:earthporn-wallpaper:v1.0 (by /u/wallpaper_script)" \
+  "https://www.reddit.com/api/v1/access_token" | jq -r '.access_token')
+
+if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
+  log "ERROR: Failed to obtain Reddit OAuth token, falling back to Unsplash"
+  fetch_unsplash
+  exit $?
+fi
+
+# Fetch top posts from r/earthporn (top of the week) via OAuth endpoint
+JSON=$(curl -s \
+  -A "linux:earthporn-wallpaper:v1.0 (by /u/wallpaper_script)" \
+  -H "Authorization: bearer $TOKEN" \
+  "https://oauth.reddit.com/r/earthporn/top?limit=50&t=week")
 
 if [ -z "$JSON" ]; then
-  log "ERROR: Failed to fetch data from Reddit, using default wallpaper"
-  awww img "$DEFAULT_WALLPAPER" --resize fit 2>/dev/null
-  exit 1
+  log "ERROR: Failed to fetch data from Reddit, falling back to Unsplash"
+  fetch_unsplash
+  exit $?
 fi
 
 # Extract image URLs (filter for direct image links and 4K+ resolution)
-# Looking for .jpg, .png, and i.redd.it links with width >= 3840px (4K)
 URLS=$(echo "$JSON" | jq -r '.data.children[].data | select(.post_hint == "image") | select(.preview.images[0].source.width >= 3840) | .url' | grep -E '\.(jpg|png)$|i\.redd\.it')
 
 if [ -z "$URLS" ]; then
-  log "ERROR: No image URLs found, using default wallpaper"
-  awww img "$DEFAULT_WALLPAPER" --resize fit 2>/dev/null
-  exit 1
+  log "WARNING: No 4K images found, relaxing resolution filter"
+  URLS=$(echo "$JSON" | jq -r '.data.children[].data | select(.post_hint == "image") | .url' | grep -E '\.(jpg|png)$|i\.redd\.it')
+fi
+
+if [ -z "$URLS" ]; then
+  log "WARNING: No Reddit images found, falling back to Unsplash"
+  fetch_unsplash
+  exit $?
 fi
 
 # Pick a random image from the list
@@ -58,7 +118,7 @@ log "Selected image: $RANDOM_URL"
 if wget -q -O "$CACHE_FILE" "$RANDOM_URL"; then
   log "Successfully downloaded wallpaper"
 
-  # Optional: Save to wallpaper collection
+  # Save to wallpaper collection
   TIMESTAMP=$(date +%Y%m%d_%H%M%S)
   cp "$CACHE_FILE" "$WALLPAPER_DIR/reddit_${TIMESTAMP}.jpg"
 
@@ -70,9 +130,9 @@ if wget -q -O "$CACHE_FILE" "$RANDOM_URL"; then
     log "WARNING: awww not found, wallpaper downloaded but not set"
   fi
 else
-  log "ERROR: Failed to download wallpaper from $RANDOM_URL, using default wallpaper"
-  awww img "$DEFAULT_WALLPAPER" --resize fit 2>/dev/null
-  exit 1
+  log "ERROR: Failed to download wallpaper from $RANDOM_URL, falling back to Unsplash"
+  fetch_unsplash
+  exit $?
 fi
 
 # Keep only the last 10 wallpapers to save space

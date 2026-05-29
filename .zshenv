@@ -13,3 +13,4 @@ export XKB_DEFAULT_VARIANT=intl
 
 # PATH
 export PATH="$PATH:${HOME}/.local/bin:${HOME}/.cargo/bin"
+
