@@ -1,23 +1,23 @@
 #!/bin/sh
-# Steam launcher using dwl's built-in XWayland
-#
-# Use this for games with input issues under native Wayland or Gamescope.
-# Known problematic games:
-# - Euro Truck Simulator 2
-# - American Truck Simulator
-# - Caves of Qud (Proton 7)
-# - Other older titles with poor Wayland support
-#
-# Requires dwl built with XWAYLAND support (-DXWAYLAND in config.mk).
-# dwl starts XWayland lazily on first X11 client connection and sets DISPLAY.
-# This gives proper keyboard/input routing via the compositor's seat management.
-#
-# For most games, use 'steam' (Gamescope) instead for better performance.
 
-if [ -z "$DISPLAY" ]; then
-  echo "xsteam: DISPLAY is not set. Make sure dwl is running with XWayland support (-DXWAYLAND)." >&2
-  echo "xsteam: Restart dwl (the new build has XWayland enabled) and try again." >&2
-  exit 1
-fi
+# Steam launcher using a dedicated Xwayland instance spanning both monitors.
+#
+# Spawns Xwayland on :1 with a single 5120x1440 virtual output so games see
+# it as one display. Connects to the running dwl Wayland session. Kills :1
+# after Steam exits so nothing leaks into the regular session.
+#
+# For single-monitor or Wayland-native games, use 'steam' instead.
 
-flatpak run com.valvesoftware.Steam "$@"
+COMBINED=$(wlr-randr 2>/dev/null | awk '
+  /current/ { match($0, /([0-9]+)x([0-9]+)/, m); w+=m[1]; if (m[2]>h) h=m[2] }
+  END { print w "x" h }
+')
+GEOMETRY=${COMBINED:-5120x1440}
+
+Xwayland :1 -geometry "$GEOMETRY" &
+XWAYLAND_PID=$!
+sleep 1
+
+DISPLAY=:1 flatpak run com.valvesoftware.Steam "$@"
+
+kill $XWAYLAND_PID 2>/dev/null

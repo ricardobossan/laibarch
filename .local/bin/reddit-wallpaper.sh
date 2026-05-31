@@ -28,10 +28,13 @@ log() {
 }
 
 fetch_unsplash() {
-  local key
-  key="$(pass show _api/UNSPLASH_ACCESS_KEY 2>/dev/null)"
+  local key unsplash_creds="$HOME/.config/wallpaper/unsplash-credentials"
+  if [ -f "$unsplash_creds" ]; then
+    . "$unsplash_creds"
+  fi
+  key="${UNSPLASH_ACCESS_KEY:-}"
   if [ -z "$key" ]; then
-    log "ERROR: Could not retrieve Unsplash key from pass, using default wallpaper"
+    log "ERROR: Could not retrieve Unsplash key from ~/.config/wallpaper/unsplash-credentials, using default wallpaper"
     awww img "$DEFAULT_WALLPAPER" --resize fit 2>/dev/null
     return 1
   fi
@@ -61,12 +64,17 @@ fetch_unsplash() {
 
 log "Starting wallpaper fetch from r/earthporn"
 
-# Load Reddit OAuth credentials from pass
-CLIENT_ID="$(pass show _api/REDDIT_CLIENT_ID 2>/dev/null)"
-CLIENT_SECRET="$(pass show _api/REDDIT_CLIENT_SECRET 2>/dev/null)"
+# Load Reddit OAuth credentials from config file
+REDDIT_CREDS="$HOME/.config/wallpaper/reddit-credentials"
+if [ -f "$REDDIT_CREDS" ]; then
+  # shellcheck source=/dev/null
+  . "$REDDIT_CREDS"
+fi
+CLIENT_ID="${REDDIT_CLIENT_ID:-}"
+CLIENT_SECRET="${REDDIT_CLIENT_SECRET:-}"
 
 if [ -z "$CLIENT_ID" ] || [ -z "$CLIENT_SECRET" ]; then
-  log "ERROR: Could not retrieve Reddit credentials from pass, falling back to Unsplash"
+  log "ERROR: Could not retrieve Reddit credentials from ~/.config/wallpaper/reddit-credentials, falling back to Unsplash"
   fetch_unsplash
   exit $?
 fi

@@ -156,6 +156,25 @@ Shows highest temperature across all devices:
 - AMD Ryzen 9 7900 + RX 6750 XT
 - Dell 7347 laptop
 
+## Gaming
+
+Two dwl binaries exist for different use cases:
+
+| Binary | Description |
+|--------|-------------|
+| `dwl` | Work mode — normal gaps, bar, standard tiling |
+| `dwl-game` | Game mode — no gaps, no bar, master window spans both monitors |
+
+Login always starts `dwl`. To switch to game mode:
+
+1. Exit dwl: `MOD+Shift+Q`
+2. From the TTY, run: `dwl-game`
+3. Launch Steam across both monitors: `xsteam`
+
+To return to work mode, exit dwl and run `dwl` (or just re-login).
+
+See [.local/share/ricing/README.md] for details on how the binaries are built and how to rebuild them.
+
 ## Post-Installation
 
 After laibarch installation completes, the system is fully functional with:
