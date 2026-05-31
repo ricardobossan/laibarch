@@ -1,9 +1,9 @@
 #!/bin/bash
-# Download and set wallpaper from r/earthporn
+# Download and set wallpaper from r/earthporn (primary) or Unsplash (fallback)
 
 WALLPAPER_DIR="$HOME/.local/share/wallpapers/reddit"
-CACHE_FILE="$HOME/.cache/reddit_wallpaper.jpg"
-LOG_FILE="$HOME/.cache/reddit_wallpaper.log"
+CACHE_FILE="$HOME/.cache/wallpaper.jpg"
+LOG_FILE="$HOME/.cache/wallpaper.log"
 DEFAULT_WALLPAPER="$HOME/.local/share/laibarch.png"
 
 # Create wallpaper directory if it doesn't exist

@@ -30,8 +30,8 @@ udiskie &
 
 awww-daemon --no-cache &
 
-# Set wallpaper from Reddit
-~/.local/bin/reddit-wallpaper.sh &
+# Set wallpaper
+~/.local/bin/wallpaper.sh &
 
 # Torrent service
 transmission-daemon &

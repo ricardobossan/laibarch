@@ -47,7 +47,7 @@
 !/.local/bin/dwl-status-click.sh
 !/.local/bin/suspend.sh
 !/.local/bin/screenshot.sh
-!/.local/bin/reddit-wallpaper.sh
+!/.local/bin/wallpaper.sh
 !/.local/bin/temp-monitor.sh
 !/.local/bin/battery-monitor.sh
 !/.local/bin/steam
