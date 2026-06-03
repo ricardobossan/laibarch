@@ -25,14 +25,14 @@ application/x-yaml=nvim.desktop
 application/pdf=mupdf.desktop
 
 # Images
-image/png=swayimg.desktop
-image/jpeg=swayimg.desktop
-image/jpg=swayimg.desktop
-image/gif=swayimg.desktop
-image/webp=swayimg.desktop
-image/svg+xml=swayimg.desktop
-image/bmp=swayimg.desktop
-image/tiff=swayimg.desktop
+image/png=imv.desktop
+image/jpeg=imv.desktop
+image/jpg=imv.desktop
+image/gif=imv.desktop
+image/webp=imv.desktop
+image/svg+xml=imv.desktop
+image/bmp=imv.desktop
+image/tiff=imv.desktop
 
 # Video
 video/mp4=mpv.desktop
