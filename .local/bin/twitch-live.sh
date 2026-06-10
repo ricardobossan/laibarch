@@ -8,12 +8,15 @@ if [ ! -f "$config" ]; then
     exit 1
 fi
 
-# Extract channel list
 mapfile -t channels < <(grep -E '^\s*-' "$config" | sed -E 's/^\s*-\s*//')
 
 if [ ${#channels[@]} -eq 0 ]; then
     echo "No channels found in config file."
     exit 1
+fi
+
+if [ -n "$1" ]; then
+    channels=("$1" "${channels[@]}")
 fi
 
 # Build playlist file
