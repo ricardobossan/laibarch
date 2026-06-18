@@ -29,7 +29,7 @@ This workflow ensures you control when plugins update and can always rollback to
 
 - **C# Development**: Roslyn LSP, DAP debugging, easy-dotnet integration
 - **Markdown**: Live preview, obsidian.nvim integration
-- **AI Assistance**: Claude Code, Copilot, Codeium
+- **AI Assistance**: Claude Code, Copilot
 - **Custom Tweaks**: Catppuccin theme, diagflow, better-escape, transparency
 
 ## Installation
