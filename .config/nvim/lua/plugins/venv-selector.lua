@@ -1,6 +1,6 @@
 return {
   "linux-cultist/venv-selector.nvim",
-  commit = "42e8faadf9b819654f29eb1a785797a3a328f301",
+  commit = "d2326e7433fdeb10f7d0d1237c18b91b353f9f8b",
   dependencies = {
     { "nvim-telescope/telescope.nvim", version = "*", dependencies = { "nvim-lua/plenary.nvim" } }, -- optional: you can also use fzf-lua, snacks, mini-pick instead.
   },
