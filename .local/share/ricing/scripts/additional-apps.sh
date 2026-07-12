@@ -48,6 +48,15 @@ echo "--------------------------------"
 
 yay -S slack-desktop --noconfirm
 echo "✓ Slack installed"
+pwd
+
+echo ""
+echo "Installing claude-code..."
+echo "--------------------------------"
+
+curl -fsSL https://claude.ai/install.sh | bash
+echo "✓ claude-code installed"
+pwd
 
 cat <<'EOF'
 
@@ -59,4 +68,5 @@ cat <<'EOF'
   - steam   - Uses Gamescope (recommended)
   - xsteam  - Uses XWayland (for games with input issues like ETS2)
 - Slack
+- claude-code
 EOF
