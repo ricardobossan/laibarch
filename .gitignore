@@ -43,6 +43,7 @@
 !.local/share/applications/tremc.desktop
 !.local/bin/
 !.local/bin/configure-displays.sh
+!.local/bin/screens.sh
 !.local/bin/dwl-autostart.sh
 !/.local/bin/dwl-status-click.sh
 !/.local/bin/suspend.sh

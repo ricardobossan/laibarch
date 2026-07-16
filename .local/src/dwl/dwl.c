@@ -3273,6 +3273,9 @@ updatemons(struct wl_listener *listener, void *data)
 			wlr_session_lock_surface_v1_configure(m->lock_surface, m->m.width, m->m.height);
 		}
 
+		/* Enable the bar node before arrangelayers() reserves space below, so a
+		 * DPMS-woken monitor doesn't tile clients under the bar. */
+		wlr_scene_node_set_enabled(&m->scene_buffer->node, showbar);
 		/* Calculate the effective monitor geometry to use for clients */
 		arrangelayers(m);
 		/* Don't move clients to the left output when plugging monitors */
