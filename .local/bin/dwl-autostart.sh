@@ -11,11 +11,11 @@ export DRI_PRIME=1
 # Update D-Bus activation environment for both Wayland and X variables
 dbus-update-activation-environment WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP
 
-# Dynamic display configuration
-kanshi &
+# Generic display baseline (no hard-coded outputs); sync so it settles first.
+configure-displays.sh
 
-# Configure displays
-configure-displays.sh &
+# Per-machine overrides (rotation/scale); a match overrides the baseline. Optional.
+kanshi &
 
 # Start notification daemon
 mako &
