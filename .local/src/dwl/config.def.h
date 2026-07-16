@@ -196,8 +196,8 @@ static const Key keys[] = {
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_plus,       spawn,          {.v = briup} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_underscore, spawn,          {.v = bridown} },
 	/* Screen power management using wlr-randr */
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Escape,     spawn,          SHCMD("wlr-randr | grep '^[A-Z]' | awk '{print $1}' | xargs -I {} wlr-randr --output {} --off") },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_O,          spawn,          SHCMD("wlr-randr | grep '^[A-Z]' | awk '{print $1}' | xargs -I {} wlr-randr --output {} --on") },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Escape,     spawn,          SHCMD("$HOME/.local/bin/screens.sh off") },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_O,          spawn,          SHCMD("$HOME/.local/bin/screens.sh on") },
 	/* MPD playback controls */
 	{ MODKEY,                    XKB_KEY_p,          spawn,          SHCMD("mpc toggle") },
 	{ MODKEY,                    XKB_KEY_bracketleft, spawn,         SHCMD("mpc prev") },

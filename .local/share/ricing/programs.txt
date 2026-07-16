@@ -73,6 +73,7 @@ ttf-jetbrains-mono
 ttf-jetbrains-mono-nerd
 syncthing
 wlr-randr
+wlopm
 fastfetch
 tmux
 zsh
