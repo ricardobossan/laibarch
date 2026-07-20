@@ -2,8 +2,9 @@ return {
   "kristijanhusak/vim-dadbod-ui",
   commit = "48c4f271da13d380592f4907e2d1d5558044e4e5",
   dependencies = {
-    { "tpope/vim-dadbod", lazy = true },
-    { "kristijanhusak/vim-dadbod-completion", ft = { "sql", "mysql", "plsql" }, lazy = true }, -- Optional
+    { "tpope/vim-dadbod", commit = "6d1d41da4873a445c5605f2005ad2c68c99d8770", lazy = true },
+    -- stylua: ignore
+    { "kristijanhusak/vim-dadbod-completion", commit = "a8dac0b3cf6132c80dc9b18bef36d4cf7a9e1fe6", ft = { "sql", "mysql", "plsql" }, lazy = true }, -- Optional
   },
   cmd = {
     "DBUI",

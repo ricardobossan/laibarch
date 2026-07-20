@@ -1,6 +1,7 @@
 return {
   {
     "milanglacier/minuet-ai.nvim",
+    commit = "7e696b717082e524286192ddaf397f709427f1a5",
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {
       provider = "claude",

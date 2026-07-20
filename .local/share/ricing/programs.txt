@@ -105,3 +105,6 @@ bluez-utils
 exfatprogs
 imv
 xlinks
+plantuml
+graphviz
+go
