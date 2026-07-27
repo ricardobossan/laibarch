@@ -4,6 +4,12 @@
 local default_opts = { noremap = true, silent = true }
 local map = vim.keymap.set
 
+-- Restore native H / L (top / bottom of the window, like M for middle).
+-- LazyVim binds them to bprevious/bnext; deleting the maps falls back to the
+-- builtin motions. Buffer switching is still on [b / ]b.
+pcall(vim.keymap.del, "n", "<S-h>")
+pcall(vim.keymap.del, "n", "<S-l>")
+
 -- Escape insert mode
 map("i", "jk", "<ESC>", default_opts)
 map("v", "jk", "<ESC>", default_opts)
