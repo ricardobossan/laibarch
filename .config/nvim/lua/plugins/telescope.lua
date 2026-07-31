@@ -1,29 +1,25 @@
 return {
   "nvim-telescope/telescope.nvim",
   keys = {
-    -- Override <leader><space> with custom finder that shows nothing when empty
+    -- Override <leader><space> to search from cwd instead of git root.
+    -- Standard find_files picker (fuzzy matching, hidden + ignored files via
+    -- opts.pickers.find_files below), except that it shows nothing until the prompt is non-empty.
     {
       "<leader><space>",
       function()
-        local pickers = require("telescope.pickers")
-        local finders = require("telescope.finders")
-        local conf = require("telescope.config").values
-        local make_entry = require("telescope.make_entry")
+        local sorter = require("telescope.config").values.file_sorter({})
+        -- Filter out every entry while the prompt is empty; score normally otherwise.
+        -- Wrapping :score rather than :scoring_function keeps these entries out of the
+        -- sorter's discard cache, so they come back as soon as something is typed.
+        local score = sorter.score
+        sorter.score = function(self, prompt, entry, cb_add, cb_filter)
+          if prompt == "" then
+            return cb_filter(entry)
+          end
+          return score(self, prompt, entry, cb_add, cb_filter)
+        end
 
-        pickers
-          .new({}, {
-            prompt_title = "Find Files",
-            finder = finders.new_job(function(prompt)
-              if not prompt or prompt == "" then
-                return nil -- Returns nil when prompt is empty, showing no results
-              end
-              -- Run rg --files with the prompt as a filter
-              return { "rg", "--files", "--hidden", "--no-ignore", "-g", "!.git", "-g", "*" .. prompt .. "*" }
-            end, make_entry.gen_from_file({})),
-            sorter = conf.file_sorter({}),
-            previewer = conf.file_previewer({}),
-          })
-          :find()
+        require("telescope.builtin").find_files({ sorter = sorter })
       end,
       desc = "Find Files (cwd)",
     },
