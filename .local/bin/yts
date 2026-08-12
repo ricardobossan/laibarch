@@ -186,6 +186,34 @@ selected=$(fzf --delimiter='\t' \
         --height=100% \
         --reverse < "$LIST" | cut -f1)
 
+# YouTube demands auth for full format extraction; without it mpv's ytdl_hook dies on
+# "Sign in to confirm you're not a bot". Search is unaffected -- --flat-playlist only
+# reads metadata. Browser cookies clear it. Set YTS_COOKIES_BROWSER= (empty) to disable.
+COOKIES="${YTS_COOKIES_BROWSER-brave}"
+
+# YouTube binds media URLs to the yt-dlp session that requested them (PO tokens), so
+# handing them to mpv's ytdl_hook gets a 403 from ffmpeg -- every player_client either
+# fails extraction or yields unfetchable URLs. So yt-dlp fetches and we pipe into mpv.
+# Merging bv+ba into mkv on the way keeps full resolution: muxed formats (-f b) stop at
+# 1080p, so 4K would be lost. A pipe still cannot be seeked; a PO-token provider (AUR
+# bgutil-ytdlp-pot-provider) would let mpv take the URLs directly and restore seeking.
+# Cap resolution with YTS_MAX_HEIGHT=1080 if 4K AV1 decoding is too heavy.
 if [ -n "$selected" ]; then
-    mpv "https://youtube.com/watch?v=$selected"
+    vurl="https://youtube.com/watch?v=$selected"
+    # Cap to the tallest connected display: fetching 4K for a 1440p screen just burns
+    # bandwidth and AV1 decode to be downscaled. YTS_MAX_HEIGHT overrides; set it empty
+    # to lift the cap entirely.
+    height="${YTS_MAX_HEIGHT-$(wlr-randr 2>/dev/null \
+        | grep -oP '^\s+\d+x\K\d+(?= px.*current)' | sort -rn | head -1)}"
+    fmt="bv*+ba/b"
+    [ -n "$height" ] && fmt="bv*[height<=$height]+ba/b"
+    # Quitting mpv early tears down the pipe; drop the resulting mux/pipe noise so real
+    # errors (expired cookies, bot check) still surface.
+    quiet() { grep -viE "broken pipe|error muxing|ffmpeg exited with code" >&2; }
+    if [ -n "$COOKIES" ]; then
+        yt-dlp -f "$fmt" --merge-output-format mkv --cookies-from-browser "$COOKIES" \
+            -o - "$vurl" 2> >(quiet) | mpv --cache=yes -
+    else
+        yt-dlp -f "$fmt" --merge-output-format mkv -o - "$vurl" 2> >(quiet) | mpv --cache=yes -
+    fi
 fi
