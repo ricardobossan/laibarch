@@ -31,6 +31,8 @@
 !.config/yazi/
 !.config/yazi/yazi.toml
 !.config/yazi/keymap.toml
+!.config/kitty/
+!.config/kitty/kitty.conf
 !.zshenv
 !.gitmodules
 !.local
