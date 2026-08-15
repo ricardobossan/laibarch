@@ -4,6 +4,8 @@
 
 ![Laibarch mascot](./.local/share/laibarch.png)
 
+> *"Laibarch" and the mascot are an unofficial homage to [Laibach](https://www.laibach.org/). Not affiliated with, endorsed by, or connected to Laibach or NSK. Tux is by Larry Ewing. Original artwork rights belong to their respective owners.*
+
 My Arch Linux rice. DWL window manager, LUKS encryption, automated installation.
 
 📖 **[User Guide](.local/share/ricing/USER-GUIDE.md)** - Essential keyboard shortcuts and system usage
@@ -212,7 +214,3 @@ Detailed documentation in [.local/share/ricing/README.md]:
 - Safe for public sharing
 
 Tested on VMs and hardware. Contributions welcome!
-
----
-
-*Laibarch name and mascot are inspired by Laibach. Not affiliated. Original artwork rights belong to their respective owners.*
