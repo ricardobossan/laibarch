@@ -8,8 +8,14 @@ export DISPLAY=${DISPLAY:-:0} # This might need adjustment if you have multiple 
 # Prefer discrete GPU
 export DRI_PRIME=1
 
-# Update D-Bus activation environment for both Wayland and X variables
-dbus-update-activation-environment WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP
+# Identify the session as wlroots so xdg-desktop-portal picks the wlr backend
+# (needed for PipeWire screen capture in OBS et al.)
+export XDG_CURRENT_DESKTOP=wlroots
+
+# Update D-Bus activation environment for both Wayland and X variables.
+# --systemd also pushes them into the 'systemd --user' environment, which
+# xdg-desktop-portal-wlr.service requires (ConditionEnvironment=WAYLAND_DISPLAY).
+dbus-update-activation-environment --systemd WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP
 
 # Generic display baseline (no hard-coded outputs); sync so it settles first.
 configure-displays.sh

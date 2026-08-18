@@ -108,3 +108,10 @@ xlinks
 plantuml
 graphviz
 go
+obs-studio
+xdg-desktop-portal
+xdg-desktop-portal-wlr
+xdg-desktop-portal-gtk
+pipewire
+pipewire-pulse
+wireplumber

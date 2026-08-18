@@ -131,7 +131,8 @@ Initializes pacman keyring, enables parallel downloads.
 - Wayland: wlroots, wayland-protocols, wl-clipboard, cliphist, wmenu, awww
 - X11 (temporary): libx11, libxft (required for slstatus - will migrate to dwlb)
 - Utilities: mako, grim, slurp, gammastep, geoclue
-- Applications: mpv, mupdf, zathura, yazi, calcurse, obsidian, syncthing
+- Applications: mpv, mupdf, zathura, yazi, calcurse, obsidian, syncthing, obs-studio
+- Screen capture: xdg-desktop-portal + xdg-desktop-portal-wlr (PipeWire ScreenCast on wlroots), pipewire, wireplumber
 - **iwd**: Network backend (explicitly enabled)
 
 **From source** (programs-scripts.sh):
@@ -220,6 +221,40 @@ Status bar shows highest temperature across all sensors:
 - ACPI thermal zones
 
 Click widget shows detailed per-component temperatures.
+
+### Screen Capture (OBS, browser screen sharing)
+
+Wayland apps do not capture the screen directly; they request a stream over the
+`org.freedesktop.portal.ScreenCast` D-Bus interface. dwl is wlroots-based, so that
+interface is only provided by `xdg-desktop-portal-wlr` — `xdg-desktop-portal-gtk`
+has no ScreenCast implementation on wlroots and leaves OBS with no selectable source.
+
+**Pieces involved (all tracked, nothing to run by hand):**
+
+| Piece | Where | Role |
+| --- | --- | --- |
+| `xdg-desktop-portal`, `-wlr`, `-gtk` | `programs.txt` | portal frontend + wlroots/GTK backends |
+| `pipewire`, `wireplumber` | `programs.txt` | carries the video stream (enabled in `bootstrap.sh`) |
+| `XDG_CURRENT_DESKTOP=wlroots` | `~/.local/bin/dwl-autostart.sh` | matches `UseIn=` in `/usr/share/xdg-desktop-portal/portals/wlr.portal` |
+| `~/.config/xdg-desktop-portal/portals.conf` | home repo | routes ScreenCast/Screenshot to `wlr`, all else to `gtk` |
+| `~/.config/xdg-desktop-portal-wlr/config` | home repo | output picker (`slurp`), fps cap |
+
+`xdg-desktop-portal-wlr.service` is D-Bus activated — it needs no `systemctl enable`, but
+it does declare `ConditionEnvironment=WAYLAND_DISPLAY`, which is why `dwl-autostart.sh`
+calls `dbus-update-activation-environment --systemd` (the `--systemd` flag pushes the
+variables into the `systemd --user` environment, not just the D-Bus one).
+
+In OBS, add source **Screen Capture (PipeWire)**; a `slurp` crosshair appears and you
+click the output to record.
+
+**Verify:**
+
+```sh
+busctl --user introspect org.freedesktop.portal.Desktop \
+  /org/freedesktop/portal/desktop | grep -i screencast
+```
+
+Printing `org.freedesktop.portal.ScreenCast` means the backend is live.
 
 ### Systemd User Services
 

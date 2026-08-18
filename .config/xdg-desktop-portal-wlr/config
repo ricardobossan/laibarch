@@ -1,0 +1,5 @@
+[screencast]
+# Pick the output by clicking on it when OBS asks for a source
+chooser_type=simple
+chooser_cmd=slurp -f %o -or
+max_fps=60

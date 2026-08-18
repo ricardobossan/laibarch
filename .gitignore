@@ -33,6 +33,15 @@
 !.config/yazi/keymap.toml
 !.config/kitty/
 !.config/kitty/kitty.conf
+!.config/xdg-desktop-portal/
+!.config/xdg-desktop-portal/portals.conf
+!.config/xdg-desktop-portal-wlr/
+!.config/xdg-desktop-portal-wlr/config
+!.config/obs-studio/
+!.config/obs-studio/global.ini
+!.config/obs-studio/basic/
+!.config/obs-studio/basic/**
+!.config/obs-studio/basic/**/*
 !.zshenv
 !.gitmodules
 !.local
