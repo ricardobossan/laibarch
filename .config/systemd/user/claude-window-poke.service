@@ -1,0 +1,10 @@
+[Unit]
+Description=Start Claude 5-hour usage window early
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/claude-window-poke.sh
+
+[Install]
+WantedBy=default.target

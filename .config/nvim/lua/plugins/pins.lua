@@ -1,6 +1,14 @@
--- Auto-generated plugin pins from lazy-lock.json
--- All plugins pinned to exact lockfile commits
--- This ensures fresh installs use locked versions instead of latest
+-- Hand-maintained plugin pins.
+--
+-- Holds pins for plugins that have no spec file of their own -- mostly those
+-- LazyVim provides. Plugins with their own file under lua/plugins/ carry their
+-- `commit` there instead; this file is the fallback, not the default home.
+--
+-- Previously generated from lazy-lock.json by scripts/generate-lockfile-pins.lua.
+-- That script is gone on purpose: lazy.nvim rewrites the working-copy lockfile on
+-- its own, so deriving pins from it silently blessed versions that were never
+-- committed. Edit entries here deliberately, and take new commits from a
+-- committed revision of lazy-lock.json rather than the working copy.
 
 return {
   { "CopilotC-Nvim/CopilotChat.nvim", commit = "cd82b6b9c4cfb254218f5782cc3339e05cbb9989" },
@@ -11,7 +19,6 @@ return {
   { "giuxtaposition/blink-cmp-copilot", commit = "439cff78780c033aa23cf061d7315314b347e3c1" },
   { "Saghen/blink.cmp", commit = "49f211fe5d729df53df4c042d7c3464cf47d199e" },
   { "Saghen/blink.compat", commit = "2ed6d9a28b07fa6f3bface818470605f8896408c" },
-  { "akinsho/bufferline.nvim", commit = "655133c3b4c3e5e05ec549b9f8cc2894ac6f51b3" },
   { "catppuccin/nvim", name = "catppuccin", commit = "5b5e3aef9ad7af84f463d17b5479f06b87d5c429" },
   { "stevearc/conform.nvim", commit = "b1a75324ddf96b7bb84963a297b1ed334db087c0" },
   { "dgagn/diagflow.nvim", commit = "b13321b517ff64bf42eeac2214085d3c76d83a0d" },

@@ -1,0 +1,16 @@
+[Unit]
+Description=Project Zomboid dedicated server (bossan)
+Documentation=https://pzwiki.net/wiki/Dedicated_server
+# Best-effort: don't try to start before the graphical/user session basics are up.
+After=default.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=%h/.local/bin/pz-server.sh start
+ExecStop=%h/.local/bin/pz-server.sh stop
+# The server saves the world on 'quit'; give it room before systemd gives up.
+TimeoutStopSec=90
+
+[Install]
+WantedBy=default.target

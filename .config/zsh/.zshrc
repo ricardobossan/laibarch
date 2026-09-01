@@ -120,9 +120,10 @@ alias \
 alias \
     todo="cd ${HOME}/Documents/ricardo/todo" \
     jh="cd ${HOME}/Documents/ricardo/processo_seletivo" \
-    ric="cd ${HOME}/Documents/ricardo && ${EDITOR} vault-root.md +ObsidianToday" \
+    ric="cd ${HOME}/Documents/ricardo" \
     bys="cd ${HOME}/Documents/bys && ${EDITOR} ." \
     docs="cd ${HOME}/Documents/zettelkasten && ${EDITOR} ." \
+    reg="cd ${HOME}/Documents/registro && yazi ." \
     cf="cd ${HOME}/.config" \
     cfz="${EDITOR} ${ZDOTDIR}/.zshrc" \
     cfb="${EDITOR} ${HOME}/.bashrc" \
