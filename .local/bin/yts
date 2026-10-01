@@ -1,11 +1,11 @@
 #!/bin/bash
-# YouTube search and play in mpv with thumbnails
+# Search YouTube and play results in mpv with thumbnails
 
 CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/yts/thumbs"
 
-# kitty/foot draw real pixels, so detail scales with the pane's pixel size. alacritty
-# has no graphics protocol; its symbol art is capped by cell count and turns to mush in
-# a small window. Override with YTS_FORMAT=kitty|sixels|symbols.
+# kitty/foot render pixels, so detail follows the pane's pixel dimensions. Alacritty lacks
+# a graphics protocol, so symbol art is limited by cell count and degrades in small panes.
+# Override detection with YTS_FORMAT=kitty|sixels|symbols.
 detect_format() {
     if [ -n "${YTS_FORMAT:-}" ]; then printf '%s' "$YTS_FORMAT"; return; fi
     case "${TERM:-}|${TERM_PROGRAM:-}|${KITTY_WINDOW_ID:+kitty}" in
@@ -15,15 +15,15 @@ detect_format() {
     esac
 }
 
-# Preview mode: fzf re-invokes this per highlighted row. Thumbnails load on demand, so
-# the result count costs nothing up front, and are cached across runs.
+# Preview mode: fzf runs this for each highlighted row. Thumbnails are fetched lazily,
+# so result count has no upfront cost, and cached images survive across runs.
 if [ "$1" = "--__preview" ]; then
     id="$2"
     f="$CACHE/$id.jpg"
     mkdir -p "$CACHE"
-    # maxres (1280x720) is missing on ~1 in 20 videos; mq (320x180) is the fallback.
-    # Not hq/sd: they are 4:3 and letterbox 16:9. Test -s, not -f -- curl -f can leave
-    # a 0-byte file on 404 and poison the cache.
+    # maxres (1280x720) is unavailable for roughly 1 in 20 videos; mq (320x180) is the fallback.
+    # hq/sd are avoided because they are 4:3 and letterbox 16:9 content. Test -s rather than -f:
+    # curl -f may leave a zero-byte file after a 404, which would corrupt the cache.
     [ -s "$f" ] || curl -sf -o "$f" "https://i.ytimg.com/vi/$id/maxresdefault.jpg"
     [ -s "$f" ] || curl -sf -o "$f" "https://i.ytimg.com/vi/$id/mqdefault.jpg"
     [ -s "$f" ] || { rm -f "$f"; echo "(no thumbnail)"; exit 0; }
@@ -31,20 +31,19 @@ if [ "$1" = "--__preview" ]; then
     cols=${FZF_PREVIEW_COLUMNS:-80}
     lines=${FZF_PREVIEW_LINES:-40}
 
-    # Graphics codes need explicit wrapping to survive a multiplexer.
+    # Graphics escape sequences must be wrapped explicitly when passing through a multiplexer.
     pass=none
     [ -n "${TMUX:-}" ] && pass=tmux
     [ -n "${STY:-}" ] && pass=screen
 
     case "$fmt" in
     kitty)
-        # Recipe from /usr/share/fzf/fzf-preview.sh: raw kitty graphics do not survive
-        # fzf's redraw, but unicode placeholders anchor the image to cells so fzf can
-        # manage it. Its trailing reset lacks a newline and fzf reads that as a scroll
-        # offset, hence the seds.
+        # Based on /usr/share/fzf/fzf-preview.sh: raw kitty graphics break across fzf redraws,
+        # while Unicode placeholders anchor images to cells that fzf can manage. The final reset
+        # lacks a newline, which fzf interprets as a scroll offset, so the output is adjusted.
         if command -v kitten >/dev/null 2>&1; then
-            # icat emits nothing when it cannot reach a real kitty. Buffer so that is
-            # detectable (and binary-safe) and we degrade to art instead of a blank pane.
+            # icat produces no output without a real kitty terminal. Buffer its binary-safe output
+            # so failure is detectable and we can fall back to art instead of showing a blank pane.
             raw=$(mktemp)
             kitten icat --clear --transfer-mode=memory --unicode-placeholder \
                 --stdin=no --place="${cols}x${lines}@0x0" "$f" >"$raw" 2>/dev/null
@@ -59,7 +58,7 @@ if [ "$1" = "--__preview" ]; then
             -w 9 --colors full --color-space din99d "$f"
         ;;
     sixels)
-        # Sixel touching the last row scrolls the pane (fzf#2544); give a line back.
+        # A Sixel touching the final row scrolls the pane (fzf#2544), so reserve one line.
         [ "$((${FZF_PREVIEW_TOP:-0} + lines))" -ge "$(tput lines 2>/dev/null || echo 999)" ] \
             && lines=$((lines - 1))
         chafa -f sixels --passthrough "$pass" -s "${cols}x${lines}" \
@@ -73,62 +72,120 @@ if [ "$1" = "--__preview" ]; then
     esac
 fi
 
+# Fetch mode: the mpv hook invokes this under setsid, making the pipeline one killable process
+# group. It fetches the current entry and preloads the following one.
+if [ "$1" = "--__fetch" ]; then
+    id="$2" fifo="$3"
+    [ -p "$fifo" ] || exit 0   # The fetch was skipped before it started.
+
+    # Full format extraction requires YouTube authentication; without cookies, mpv's ytdl_hook
+    # can fail with "Sign in to confirm you're not a bot". Search still works because --flat-playlist
+    # only retrieves metadata. Set YTS_COOKIES_BROWSER= to disable browser-cookie loading.
+    COOKIES="${YTS_COOKIES_BROWSER-brave}"
+    cookies=()
+    [ -n "$COOKIES" ] && cookies=(--cookies-from-browser "$COOKIES")
+
+    # Limit downloads to the tallest connected display; fetching 4K for a 1440p screen wastes
+    # bandwidth and AV1 decoding work. YTS_MAX_HEIGHT overrides this; leave it empty for no limit.
+    height="${YTS_MAX_HEIGHT-$(wlr-randr 2>/dev/null \
+        | grep -oP '^\s+\d+x\K\d+(?= px.*current)' | sort -rn | head -1)}"
+    fmt="bv*+ba/b"
+    [ -n "$height" ] && fmt="bv*[height<=$height]+ba/b"
+
+    # YouTube ties media URLs to the yt-dlp session that requested them through PO tokens, so
+    # mpv's ytdl_hook can get a 403 from ffmpeg on formats above the lowest quality levels.
+    # yt-dlp therefore fetches the media while mpv consumes a pipe. Merging bv+ba into MKV preserves
+    # full resolution because muxed (-f b) formats are limited to 1080p. Pipes cannot seek; installing
+    # a PO-token provider such as AUR bgutil-ytdlp-pot-provider would let mpv use URLs directly.
+    # Write the download to disk at full speed rather than directly into the pipe: otherwise prefetch
+    # can block on the pipe buffer for an entire song and cause the connection to drop. tail streams
+    # the completed file to mpv and exits when yt-dlp finishes. yt-dlp also sleeps about 5s per video
+    # when required by the site, and prefetching conceals that delay.
+    yt-dlp -q --no-warnings -f "$fmt" --merge-output-format mkv "${cookies[@]}" \
+        --downloader-args "ffmpeg:-hide_banner -loglevel error" \
+        -o - "https://youtube.com/watch?v=$id" > "$fifo.mkv" &
+    exec tail -c +1 -s 0.2 --pid=$! -f "$fifo.mkv" > "$fifo"
+fi
+
 COUNT="${YTS_COUNT:-50}"
+PLAYLISTS=
+SHUFFLE=
+
+usage() {
+    cat >&2 <<'USAGE'
+Usage: yts [-n COUNT] <query>   pick videos (Tab queues several), play them
+       yts -p <query>           play the top playlist for <query>, no picking
+       -s                       shuffle
+USAGE
+    exit 1
+}
 
 while [ $# -gt 0 ]; do
     case "$1" in
         -n)  COUNT="$2"; shift 2 ;;
         -n*) COUNT="${1#-n}"; shift ;;
+        -p)  PLAYLISTS=1; shift ;;
+        -s)  SHUFFLE=1; shift ;;
         --)  shift; break ;;
-        -*)  echo "Usage: yts [-n COUNT] <search query>" >&2; exit 1 ;;
+        -*)  usage ;;
         *)   break ;;
     esac
 done
 
-if [ $# -eq 0 ]; then
-    echo "Usage: yts [-n COUNT] <search query>" >&2
-    exit 1
-fi
+[ $# -eq 0 ] && usage
 
 mkdir -p "$CACHE"
 
 SELF=$(readlink -f "$0")
 
-# alacritty cannot draw images, so hop into kitty just for the picker rather than
-# changing the default terminal. Guards: no recursion, no hijacking a pipe or script,
-# no overriding an explicit YTS_FORMAT, and only if kitty exists.
-if [ -z "${YTS_SPAWNED:-}" ] && [ -z "${YTS_NO_SPAWN:-}" ] && [ -z "${YTS_FORMAT:-}" ] \
-   && [ -t 1 ] && [ "$(detect_format)" = "symbols" ] && command -v kitty >/dev/null 2>&1; then
+# Alacritty cannot display images, so launch the picker in kitty without changing the default
+# terminal. This requires no -p mode, recursion, pipe/script execution, or explicit format override.
+# It also requires kitty to be installed.
+if [ -z "$PLAYLISTS" ] && [ -z "${YTS_SPAWNED:-}" ] && [ -z "${YTS_NO_SPAWN:-}" ] \
+   && [ -z "${YTS_FORMAT:-}" ] && [ -t 1 ] && [ "$(detect_format)" = "symbols" ] \
+   && command -v kitty >/dev/null 2>&1; then
     echo "This terminal can't draw images; opening kitty for real thumbnails." >&2
     echo "(YTS_NO_SPAWN=1 to stay here with symbol art.)" >&2
-    # </dev/null: setsid detaches the session, but an inherited pty on fd 0 still earns
-    # a SIGHUP. -u TMUX: the new window is not inside tmux, yet would inherit the var and
-    # wrap its graphics in passthrough sequences nothing unwraps -- invisible images.
+    # </dev/null: setsid detaches the session, but an inherited fd 0 pty can still trigger SIGHUP.
+    # -u TMUX: the new window is outside tmux, but inherited variables would make graphics use
+    # passthrough sequences that nothing unwraps, leaving the images invisible.
     YTS_SPAWNED=1 setsid env -u TMUX -u TMUX_PANE -u STY \
-        kitty -e "$SELF" -n "$COUNT" -- "$@" </dev/null >/dev/null 2>&1 &
+        kitty -e "$SELF" -n "$COUNT" ${SHUFFLE:+-s} -- "$@" </dev/null >/dev/null 2>&1 &
     exit 0
 fi
 
-LIST=$(mktemp)
-trap 'rm -f "$LIST"' EXIT
+# Keep playback data under the cache rather than /tmp, since both current and next videos are
+# buffered here in full.
+WORK=$(mktemp -d "$CACHE/../play.XXXXXX")
+cleanup() {
+    for f in "$WORK"/*.pid; do
+        [ -f "$f" ] && kill -TERM -- -"$(cat "$f")" 2>/dev/null
+    done
+    rm -rf "$WORK"
+}
+trap cleanup EXIT
+LIST="$WORK/list"
 
-echo "Searching YouTube for '$*' ($COUNT results)..." >&2
+# Emit rows containing the thumbnail id, target id, raw title, and display columns. Search results
+# and playlist entries use the same layout, allowing both to share a single picker.
+# $1: any source yt-dlp can flatten, such as ytsearchN:, a results page, or a playlist URL.
+list_rows() {
+    # --print uses literal tabs: piping --get-title/--get-id through `paste - -` can misalign
+    # titles and IDs when a title contains a newline.
+    yt-dlp "$1" \
+        --no-playlist \
+        --extractor-args "youtube:player_client=default" \
+        --flat-playlist \
+        ${2:+--playlist-end "$2"} \
+        --print $'%(id)s\t%(title)s\t%(channel)s\t%(duration)s\t%(view_count)s\t%(thumbnails.0.url)s' \
+        2>/dev/null | \
+    python3 -c '
+import re, sys, unicodedata
 
-# --print with real tabs: --get-title/--get-id piped through `paste - -` desyncs titles
-# from IDs whenever a title contains a newline.
-yt-dlp "ytsearch$COUNT:$*" \
-    --no-playlist \
-    --extractor-args "youtube:player_client=default" \
-    --flat-playlist \
-    --print $'%(id)s\t%(title)s\t%(channel)s\t%(duration)s\t%(view_count)s' \
-    2>/dev/null | \
-python3 -c '
-import sys, unicodedata
-
-# Pad by display width, not character count: emoji and CJK occupy two columns, so
-# counting characters (as awk does) leaves the columns ragged.
+# Measure terminal display width rather than character count: emoji and CJK can consume two
+# columns, so character-based padding leaves the fields misaligned.
 def cw(ch):
-    if ch in "\ufe0f\ufe0e" or unicodedata.category(ch) in ("Mn", "Me", "Cf"):
+    if ch in "️︎" or unicodedata.category(ch) in ("Mn", "Me", "Cf"):
         return 0
     return 2 if unicodedata.east_asian_width(ch) in ("W", "F") else 1
 
@@ -167,53 +224,128 @@ def views(v):
 
 for line in sys.stdin:
     p = line.rstrip("\n").split("\t")
-    if len(p) < 5:
+    if len(p) < 6:
         continue
-    sys.stdout.write("%s\t%s  %s  %8s  %8s\n"
-                     % (p[0], fit(p[1], 70), fit(p[2], 18), hms(p[3]), views(p[4])))
-' > "$LIST"
+    vid, title, chan, dur, vc, thumb = p[:6]
+    # Preserve unavailable playlist slots but exclude them from playable output.
+    if title in ("[Private video]", "[Deleted video]"):
+        continue
+    # Video IDs are 11 characters. Playlists have no thumbnail ID of their own, so YouTube
+    # displays the cover video's image; extract that ID from the thumbnail URL for the preview.
+    if len(vid) == 11:
+        tid, dur = vid, hms(dur)
+    else:
+        m = re.search(r"/vi/([\w-]{11})/", thumb)
+        tid, dur = (m.group(1) if m else "-"), "playlist"
+    sys.stdout.write("%s\t%s\t%s\t%s  %s  %8s  %8s\n"
+                     % (tid, vid, title, fit(title, 70), fit(chan, 18), dur, views(vc)))
+'
+}
 
-if [ ! -s "$LIST" ]; then
-    echo "No results." >&2
-    exit 1
-fi
-
-selected=$(fzf --delimiter='\t' \
-        --with-nth=2.. \
+# Output the selected target IDs, one per line; additional arguments are forwarded to fzf.
+pick() {
+    fzf --delimiter='\t' \
+        --with-nth=4.. \
         --preview="$SELF --__preview {1}" \
         --preview-window=up:70% \
-        --prompt="Select video: " \
         --height=100% \
-        --reverse < "$LIST" | cut -f1)
+        --reverse "$@" < "$LIST" | cut -f2
+}
 
-# YouTube demands auth for full format extraction; without it mpv's ytdl_hook dies on
-# "Sign in to confirm you're not a bot". Search is unaffected -- --flat-playlist only
-# reads metadata. Browser cookies clear it. Set YTS_COOKIES_BROWSER= (empty) to disable.
-COOKIES="${YTS_COOKIES_BROWSER-brave}"
-
-# YouTube binds media URLs to the yt-dlp session that requested them (PO tokens), so
-# handing them to mpv's ytdl_hook gets a 403 from ffmpeg -- every player_client either
-# fails extraction or yields unfetchable URLs. So yt-dlp fetches and we pipe into mpv.
-# Merging bv+ba into mkv on the way keeps full resolution: muxed formats (-f b) stop at
-# 1080p, so 4K would be lost. A pipe still cannot be seeked; a PO-token provider (AUR
-# bgutil-ytdlp-pot-provider) would let mpv take the URLs directly and restore seeking.
-# Cap resolution with YTS_MAX_HEIGHT=1080 if 4K AV1 decoding is too heavy.
-if [ -n "$selected" ]; then
-    vurl="https://youtube.com/watch?v=$selected"
-    # Cap to the tallest connected display: fetching 4K for a 1440p screen just burns
-    # bandwidth and AV1 decode to be downscaled. YTS_MAX_HEIGHT overrides; set it empty
-    # to lift the cap entirely.
-    height="${YTS_MAX_HEIGHT-$(wlr-randr 2>/dev/null \
-        | grep -oP '^\s+\d+x\K\d+(?= px.*current)' | sort -rn | head -1)}"
-    fmt="bv*+ba/b"
-    [ -n "$height" ] && fmt="bv*[height<=$height]+ba/b"
-    # Quitting mpv early tears down the pipe; drop the resulting mux/pipe noise so real
-    # errors (expired cookies, bot check) still surface.
-    quiet() { grep -viE "broken pipe|error muxing|ffmpeg exited with code" >&2; }
-    if [ -n "$COOKIES" ]; then
-        yt-dlp -f "$fmt" --merge-output-format mkv --cookies-from-browser "$COOKIES" \
-            -o - "$vurl" 2> >(quiet) | mpv --cache=yes -
-    else
-        yt-dlp -f "$fmt" --merge-output-format mkv -o - "$vurl" 2> >(quiet) | mpv --cache=yes -
-    fi
+if [ -n "$PLAYLISTS" ]; then
+    echo "Searching YouTube playlists for '$*'..." >&2
+    # sp=EgIQAw== applies the results page's "Type: Playlist" filter; ytsearch: searches videos only.
+    q=$(python3 -c 'import sys, urllib.parse; print(urllib.parse.quote_plus(sys.argv[1]))' "$*")
+    top=$(list_rows "https://www.youtube.com/results?search_query=$q&sp=EgIQAw%3D%3D" 1)
+    [ -n "$top" ] || { echo "No playlists found." >&2; exit 1; }
+    echo "Playing: $(cut -f3 <<<"$top")" >&2
+    list_rows "https://www.youtube.com/playlist?list=$(cut -f2 <<<"$top")" > "$LIST"
+    [ -s "$LIST" ] || { echo "Playlist is empty or unavailable." >&2; exit 1; }
+    mapfile -t ids < <(cut -f2 "$LIST")
+else
+    echo "Searching YouTube for '$*' ($COUNT results)..." >&2
+    list_rows "ytsearch$COUNT:$*" > "$LIST"
+    [ -s "$LIST" ] || { echo "No results." >&2; exit 1; }
+    # Enter plays the highlighted video, while Tab adds multiple selections to the queue.
+    mapfile -t ids < <(pick --multi --bind 'ctrl-a:toggle-all' \
+        --header='Tab: queue · Ctrl-A: queue all · Enter: play' --prompt="Select video: ")
 fi
+
+[ ${#ids[@]} -gt 0 ] || exit 0
+[ -n "$SHUFFLE" ] && mapfile -t ids < <(printf '%s\n' "${ids[@]}" | shuf)
+
+# Use one mpv instance with a real playlist so tracks play consecutively and > / < navigate.
+# Each entry is a yts://ID placeholder; the hook replaces it with a named pipe populated by
+# `yts --__fetch`, since mpv cannot retrieve these streams directly.
+{
+    echo '#EXTM3U'
+    for id in "${ids[@]}"; do
+        printf '#EXTINF:-1,%s\nyts://%s\n' \
+            "$(awk -F'\t' -v id="$id" '$2 == id { print $3; exit }' "$LIST")" "$id"
+    done
+} > "$WORK/queue.m3u"
+
+cat > "$WORK/yts.lua" <<'LUA'
+local dir, self = mp.get_opt("yts-dir"), mp.get_opt("yts-self")
+local jobs = {}  -- playlist index -> true while its fetch may be running
+
+local function id_at(pos)
+    local f = mp.get_property("playlist/" .. pos .. "/filename") or ""
+    return f:match("^yts://([%w_-]+)$")
+end
+
+local function start(pos)
+    local id = id_at(pos)
+    if not id or jobs[pos] then return end
+    jobs[pos] = true
+    local fifo = dir .. "/" .. pos
+    mp.command_native({ name = "subprocess", playback_only = false, args = { "mkfifo", fifo } })
+    mp.command_native_async({ name = "subprocess", playback_only = false,
+        -- sh becomes the process-group leader, making its PID the group ID. `|| :` treats
+        -- an intentional SIGPIPE/TERM from a skipped fetch as success instead of an mpv error.
+        args = { "setsid", "sh", "-c", 'echo $$ > "$3.pid"; "$0" "$@" || :',
+                 self, "--__fetch", id, fifo } },
+        function() end)
+end
+
+local function kill(pos, retry)
+    local fifo = dir .. "/" .. pos
+    local f = io.open(fifo .. ".pid")
+    if not f then
+        -- The fetch has not recorded its PID yet; removing the pipe lets it terminate naturally.
+        os.remove(fifo)
+        if not retry then mp.add_timeout(2, function() kill(pos, true) end) end
+        return
+    end
+    local pgid = f:read("*l"); f:close()
+    mp.command_native({ name = "subprocess", playback_only = false,
+        args = { "sh", "-c", 'kill -TERM -- "-$0" 2>/dev/null || :', pgid } })
+    for _, p in ipairs({ fifo, fifo .. ".pid", fifo .. ".mkv" }) do os.remove(p) end
+    jobs[pos] = nil
+end
+
+mp.add_hook("on_load", 50, function()
+    if not mp.get_property("stream-open-filename", ""):match("^yts://") then return end
+    local pos = mp.get_property_number("playlist-pos", 0)
+    for p in pairs(jobs) do if p ~= pos and p ~= pos + 1 then kill(p) end end
+    start(pos)
+    mp.set_property("stream-open-filename", dir .. "/" .. pos)
+    local title = mp.get_property("playlist/" .. pos .. "/title")
+    if title then mp.set_property("file-local-options/force-media-title", title) end
+end)
+
+-- Begin fetching the following video after playback starts, minimizing the transition delay.
+mp.register_event("file-loaded", function()
+    start(mp.get_property_number("playlist-pos", 0) + 1)
+end)
+
+mp.register_event("shutdown", function()
+    for p in pairs(jobs) do kill(p, true) end
+end)
+LUA
+
+[ ${#ids[@]} -gt 1 ] && echo "${#ids[@]} videos: > next, < previous, q quits." >&2
+# Each item uses a new pipe, preventing a stale saved position from selecting the wrong stream.
+mpv --cache=yes --no-resume-playback --no-save-position-on-quit \
+    --script="$WORK/yts.lua" --script-opts="yts-dir=$WORK,yts-self=$SELF" \
+    --playlist="$WORK/queue.m3u"
