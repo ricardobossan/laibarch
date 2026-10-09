@@ -165,6 +165,17 @@ alias \
 # }
 
 # -----------------------------------------------------------------------------
+# yazi: open in ~/Documents when no path is given
+# -----------------------------------------------------------------------------
+yazi() {
+    if [ $# -eq 0 ]; then
+        command yazi "${HOME}/Documents/ricardo"
+    else
+        command yazi "$@"
+    fi
+}
+
+# -----------------------------------------------------------------------------
 # Tmux auto-start
 # -----------------------------------------------------------------------------
 # Only auto-start in terminal emulators (pts), not on login TTY
