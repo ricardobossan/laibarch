@@ -115,3 +115,4 @@ xdg-desktop-portal-gtk
 pipewire
 pipewire-pulse
 wireplumber
+whisper-cpp
