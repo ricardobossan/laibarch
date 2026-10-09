@@ -5,17 +5,32 @@
 #
 # Requires: whisper-cpp (pacman), ffmpeg. GPU: ggml-vulkan (without it, runs on CPU).
 # Model: ~/.local/share/whisper-models/ggml-large-v3-turbo-q5_0.bin
+#   (downloaded from Hugging Face on first run, ~550 MB, checked by sha256).
 # Audio that is already transcribed is skipped. Output with timestamps.
 
 set -euo pipefail
 
 DIR="${1:-.}"
-MODEL="${WHISPER_MODEL:-$HOME/.local/share/whisper-models/ggml-large-v3-turbo-q5_0.bin}"
+DEFAULT_MODEL="$HOME/.local/share/whisper-models/ggml-large-v3-turbo-q5_0.bin"
+MODEL_URL="https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo-q5_0.bin"
+MODEL_SHA256="394221709cd5ad1f40c46e6031ca61bce88931e6e088c188294c6d5a55ffa7e2"
+MODEL="${WHISPER_MODEL:-$DEFAULT_MODEL}"
 # With a GPU, a few threads are enough; use WHISPER_THREADS=$(nproc) when running on CPU only.
 THREADS="${WHISPER_THREADS:-4}"
 
 command -v whisper-cli >/dev/null || { echo "Falta o whisper-cpp: sudo pacman -S --needed whisper-cpp" >&2; exit 1; }
 command -v ffmpeg >/dev/null || { echo "Falta o ffmpeg: sudo pacman -S --needed ffmpeg" >&2; exit 1; }
+
+# Only the default model is fetched; a custom WHISPER_MODEL must already exist.
+if [ ! -f "$MODEL" ] && [ "$MODEL" = "$DEFAULT_MODEL" ]; then
+    echo "Baixando modelo (~550 MB) para $MODEL ..."
+    mkdir -p "$(dirname "$MODEL")"
+    tmp="$MODEL.part"
+    curl -fL --retry 3 -C - -o "$tmp" "$MODEL_URL"
+    echo "$MODEL_SHA256  $tmp" | sha256sum -c --quiet - \
+        || { echo "sha256 do modelo não confere; removendo $tmp" >&2; rm -f "$tmp"; exit 1; }
+    mv "$tmp" "$MODEL"
+fi
 [ -f "$MODEL" ] || { echo "Modelo não encontrado em $MODEL" >&2; exit 1; }
 
 shopt -s nullglob nocaseglob
