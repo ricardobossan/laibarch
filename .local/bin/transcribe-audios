@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# Transcribes audio files (WhatsApp and others) to a .txt next to each file.
+#
+#   transcribe-audios [folder]     (default: current folder)
+#
+# Requires: whisper-cpp (pacman), ffmpeg. GPU: ggml-vulkan (without it, runs on CPU).
+# Model: ~/.local/share/whisper-models/ggml-large-v3-turbo-q5_0.bin
+# Audio that is already transcribed is skipped. Output with timestamps.
+
+set -euo pipefail
+
+DIR="${1:-.}"
+MODEL="${WHISPER_MODEL:-$HOME/.local/share/whisper-models/ggml-large-v3-turbo-q5_0.bin}"
+# With a GPU, a few threads are enough; use WHISPER_THREADS=$(nproc) when running on CPU only.
+THREADS="${WHISPER_THREADS:-4}"
+
+command -v whisper-cli >/dev/null || { echo "Falta o whisper-cpp: sudo pacman -S --needed whisper-cpp" >&2; exit 1; }
+command -v ffmpeg >/dev/null || { echo "Falta o ffmpeg: sudo pacman -S --needed ffmpeg" >&2; exit 1; }
+[ -f "$MODEL" ] || { echo "Modelo não encontrado em $MODEL" >&2; exit 1; }
+
+shopt -s nullglob nocaseglob
+encontrados=0
+
+for f in "$DIR"/*.{ogg,opus,oga,mp3,m4a,aac,wav,mp4}; do
+    encontrados=1
+    out="${f%.*}.txt"
+    [ -f "$out" ] && { echo "pulando (já transcrito): $(basename "$f")"; continue; }
+
+    wav="$(mktemp --suffix=.wav)"
+    ffmpeg -v error -y -i "$f" -ar 16000 -ac 1 -c:a pcm_s16le "$wav"
+
+    echo "transcrevendo: $(basename "$f")"
+    whisper-cli -m "$MODEL" -f "$wav" -l pt -t "$THREADS" --output-txt --output-file "${out%.txt}" >/dev/null
+    rm -f "$wav"
+
+    echo "  -> $(basename "$out")"
+done
+
+[ "$encontrados" -eq 0 ] && echo "Nenhum áudio encontrado em $DIR"
+exit 0

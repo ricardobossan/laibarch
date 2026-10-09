@@ -67,6 +67,7 @@
 !/.local/bin/yts
 !/.local/bin/change-profile
 !/.local/bin/twitch-live.sh
+!/.local/bin/transcribe-audios
 !.local/src/
 !.local/src/dwl
 !.local/src/dwl/**
