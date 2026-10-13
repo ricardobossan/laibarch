@@ -1,0 +1,226 @@
+#!/bin/sh
+# Display management for dwl: login layout, saved per-machine order, screen power.
+#
+#   displays auto          baseline layout at login (run by dwl-autostart.sh)
+#   displays order [OUT…]  set the left-to-right order, apply it and save it
+#   displays save          save the live layout (incl. rotation/scale) for next logins
+#   displays on | off      wake / blank all screens (dwl keybindings)
+#
+# Saved layouts are kanshi profiles in ~/.config/kanshi/config (per machine, not
+# tracked). They match monitors by make/model/serial, so a layout follows the
+# monitors, not the ports they are plugged into. kanshi starts right after
+# `displays auto` and overrides the baseline whenever a saved profile matches.
+
+KANSHI_CONFIG=${XDG_CONFIG_HOME:-$HOME/.config}/kanshi/config
+WALLPAPER=$HOME/.cache/wallpaper.jpg
+
+# kanshi identifies an output as "make model serial", "Unknown" for missing parts.
+JQ_DEFS='
+def crit: [.make, .model, .serial] | map(if . == null or . == "" then "Unknown" else . end) | join(" ");
+def mode(which): [.modes[] | select(.[which])][0] // .modes[0];
+def logical_width(which): mode(which) as $m
+	| (if (.transform // "normal" | test("90|270")) then $m.height else $m.width end)
+	  / (.scale // 1) | round;
+'
+
+die() {
+	echo "displays: $*" >&2
+	exit 1
+}
+
+usage() {
+	sed -n '4,7s/^# \{0,3\}/  /p' "$0" >&2
+	exit 1
+}
+
+read_outputs() {
+	json=$(wlr-randr --json 2>/dev/null) || die "wlr-randr failed (not in a Wayland session?)"
+}
+
+q() {
+	filter=$1
+	shift
+	printf '%s' "$json" | jq -r "$JQ_DEFS $filter" "$@"
+}
+
+# Prints the config without (mode=drop), or tests for (mode=has), any profile
+# whose set of outputs equals $WANT (newline-separated criteria). The comment
+# lines right above a dropped profile go with it.
+kanshi_profiles() {
+	[ -f "$KANSHI_CONFIG" ] || return 1
+	WANT=$2 awk -v mode="$1" '
+		BEGIN {
+			n = split(ENVIRON["WANT"], w, "\n")
+			for (i = 1; i <= n; i++) if (w[i] != "" && !(w[i] in want)) { want[w[i]] = 1; wantn++ }
+			status = 1
+		}
+		function end_block(   k, same) {
+			same = (blkn == wantn)
+			for (k in blk) if (!(k in want)) same = 0
+			if (same) status = 0
+			else if (mode == "drop") printf "%s", buf
+			buf = ""; blkn = 0; split("", blk)
+		}
+		inblock {
+			buf = buf $0 "\n"
+			if ($1 == "output") {
+				c = $2
+				if (match($0, /"[^"]*"/)) c = substr($0, RSTART + 1, RLENGTH - 2)
+				if (!(c in blk)) { blk[c] = 1; blkn++ }
+			}
+			if ($0 ~ /^[ \t]*}/) { inblock = 0; end_block() }
+			next
+		}
+		/^[ \t]*#/ { pending = pending $0 "\n"; next }
+		/^[ \t]*profile([ \t].*)?\{[ \t]*$/ { inblock = 1; buf = pending $0 "\n"; pending = ""; next }
+		{ if (mode == "drop") printf "%s", pending $0 "\n"; pending = "" }
+		END {
+			if (mode == "drop") printf "%s", pending
+			exit (mode == "has" ? status : 0)
+		}
+	' "$KANSHI_CONFIG"
+}
+
+# Baseline: externals on (internal panels off when any external is present),
+# gapless left to right sorted by port name, preferred mode, one atomic call.
+cmd_auto() {
+	json=$(wlr-randr --json 2>/dev/null) || exit 0
+	names=$(q '.[].name')
+	[ -n "$names" ] || exit 0
+
+	externals=$(printf '%s\n' "$names" | grep -Ev '^(eDP|LVDS|DSI)' | sort | tr '\n' ' ')
+	if [ -n "$externals" ]; then
+		active=$externals
+	else
+		active=$(printf '%s\n' "$names" | sort | tr '\n' ' ')
+	fi
+
+	args=""
+	x=0
+	for name in $active; do
+		args="$args --output $name --on --preferred --pos ${x},0"
+		x=$((x + $(q '.[] | select(.name==$n) | logical_width("preferred")' --arg n "$name")))
+	done
+	for name in $names; do
+		case " $active " in
+			*" $name "*) : ;;
+			*) args="$args --output $name --off" ;;
+		esac
+	done
+	# shellcheck disable=SC2086
+	wlr-randr $args
+
+	# Port-name order is a guess once 2+ externals are involved. Nudge until the
+	# user saves a layout (delayed so the notification daemon is up).
+	set -- $externals
+	if [ $# -ge 2 ] && ! kanshi_profiles has "$(q '.[] | crit')"; then
+		(sleep 5; notify-send "Displays" "Monitor order was guessed from port names. Run 'displays order' to change it, or 'displays save' to keep it.") &
+	fi
+}
+
+cmd_save() {
+	read_outputs
+	set_crits=$(q '.[] | crit')
+	dupes=$(printf '%s\n' "$set_crits" | sort | uniq -d)
+	[ -z "$dupes" ] || echo "displays: warning: several outputs report '$dupes'; kanshi can't tell them apart, so their order may swap." >&2
+
+	name=$(q '"saved-" + ([.[] | .model // "unknown"] | sort | join("-") | gsub("[^A-Za-z0-9-]"; "_"))')
+	profile=$(q '
+		"profile \($name) {",
+		(.[] | if .enabled then
+			mode("current") as $m
+			| "    output \"\(crit)\" enable mode \($m.width)x\($m.height)@\($m.refresh) position \(.position.x),\(.position.y) transform \(.transform // "normal") scale \(.scale // 1)"
+		else
+			"    output \"\(crit)\" disable"
+		end),
+		"}"' --arg name "$name")
+	[ -n "$profile" ] || die "could not read the current layout"
+
+	mkdir -p "$(dirname "$KANSHI_CONFIG")"
+	tmp="$KANSHI_CONFIG.tmp.$$"
+	{
+		kanshi_profiles drop "$set_crits"
+		printf '\n# Saved by `displays save` on %s\n%s\n' "$(date +%F)" "$profile"
+	} | cat -s >"$tmp" && mv "$tmp" "$KANSHI_CONFIG" || { rm -f "$tmp"; die "could not write $KANSHI_CONFIG"; }
+
+	kanshictl reload >/dev/null 2>&1 || true
+	echo "Saved profile '$name' to $KANSHI_CONFIG"
+}
+
+cmd_order() {
+	read_outputs
+	# Enabled outputs left to right, then disabled ones.
+	list=$(q '(map(select(.enabled)) | sort_by(.position.x)) + map(select(.enabled | not)) | .[].name')
+
+	if [ $# -eq 0 ]; then
+		[ -t 0 ] || die "usage: displays order OUTPUT... (left to right)"
+		echo "Connected outputs (current order):"
+		i=0
+		for name in $list; do
+			i=$((i + 1))
+			q '.[] | select(.name==$n)
+				| "  \($i)) \(.name)  \(.model // "?")  " + (if .enabled then "x=\(.position.x)" else "off" end)' \
+				--arg n "$name" --arg i "$i"
+		done
+		printf 'New left-to-right order (numbers or names; unlisted outputs turn off): '
+		read -r answer || exit 1
+		# shellcheck disable=SC2086
+		set -- $answer
+		[ $# -gt 0 ] || { echo "Nothing changed."; exit 0; }
+	fi
+
+	order=""
+	for arg in "$@"; do
+		case $arg in
+			*[!0-9]*) name=$arg ;;
+			*) name=$(printf '%s\n' "$list" | sed -n "${arg}p") ;;
+		esac
+		printf '%s\n' "$list" | grep -qxF -- "$name" || die "unknown output '$arg' (have: $(echo $list))"
+		case " $order " in *" $name "*) die "'$name' listed twice" ;; esac
+		order="$order $name"
+	done
+
+	args=""
+	x=0
+	for name in $order; do
+		if [ "$(q '.[] | select(.name==$n) | .enabled' --arg n "$name")" = true ]; then
+			which=current
+			args="$args --output $name --pos ${x},0"
+		else
+			which=preferred
+			args="$args --output $name --on --preferred --pos ${x},0"
+		fi
+		x=$((x + $(q '.[] | select(.name==$n) | logical_width($w)' --arg n "$name" --arg w "$which")))
+	done
+	for name in $list; do
+		case " $order " in *" $name "*) : ;; *) args="$args --output $name --off" ;; esac
+	done
+	# shellcheck disable=SC2086
+	wlr-randr $args || die "wlr-randr rejected the layout"
+	cmd_save
+}
+
+# wlopm, not `wlr-randr --off/--on`: dwl's DPMS path only toggles each output's
+# enabled flag without re-adding it to the layout, so monitor order survives.
+cmd_power() {
+	wlopm "--$1" '*'
+	[ "$1" = on ] || return 0
+	# awww can drop surfaces across the power cycle; reapply (cached, instant),
+	# one output at a time (a multi-output request stalls on a covered output).
+	outputs=$(awww query -j 2>/dev/null | jq -r '.[][].name')
+	if [ -z "$outputs" ]; then
+		awww img "$WALLPAPER"
+		return
+	fi
+	for out in $outputs; do
+		awww img -o "$out" "$WALLPAPER"
+	done
+}
+
+case "$1" in
+	auto) cmd_auto ;;
+	save) cmd_save ;;
+	order) shift; cmd_order "$@" ;;
+	on | off) cmd_power "$1" ;;
+	*) usage ;;
+esac

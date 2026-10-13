@@ -17,10 +17,10 @@ export XDG_CURRENT_DESKTOP=wlroots
 # xdg-desktop-portal-wlr.service requires (ConditionEnvironment=WAYLAND_DISPLAY).
 dbus-update-activation-environment --systemd WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP
 
-# Generic display baseline (no hard-coded outputs); sync so it settles first.
-configure-displays.sh
+# Baseline layout (externals by port name); sync so it settles first.
+displays auto
 
-# Per-machine overrides (rotation/scale); a match overrides the baseline. Optional.
+# Saved per-machine layouts (`displays order` / `displays save`) override the baseline.
 kanshi &
 
 # Start notification daemon

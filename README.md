@@ -72,6 +72,7 @@ This is a **home directory git repository**. The entire `$HOME` is tracked with 
 │   ├── bin/                   # User scripts
 │   │   ├── battery-monitor.sh
 │   │   ├── brightness.sh      # Universal brightness (laptop + desktop)
+│   │   ├── displays           # Monitor layout/order + screen power
 │   │   ├── dwl-autostart.sh
 │   │   ├── dwl-status-click.sh
 │   │   └── temp-monitor.sh
@@ -142,6 +143,19 @@ Works on both laptops and desktops:
 - **Desktops**: Uses `ddcutil` (DDC/CI protocol for external monitors)
 - Keybindings: `MODKEY+Shift+-` / `MODKEY+Shift+=`
 
+### Displays
+
+Monitors are handled by `~/.local/bin/displays`:
+
+| Command | What it does |
+|---------|--------------|
+| `displays auto` | Login baseline: external monitors on (laptop panel off when any is connected), left to right by port name |
+| `displays order` | Lists monitors and asks for the left-to-right order; applies and saves it. Also takes names directly: `displays order HDMI-A-1 DP-1` |
+| `displays save` | Saves the current layout as-is (arrange it first with `wlr-randr` or a GUI like `wdisplays`, e.g. for rotation or scale) |
+| `displays on` / `off` | Wake / blank all screens (`MODKEY+Shift+O` / `MODKEY+Shift+Escape`) |
+
+Port order rarely matches where monitors sit on the desk, so with 2+ monitors a notification asks you to run `displays order` once. Saved layouts go to `~/.config/kanshi/config` (per machine, untracked) and match monitors by make/model/serial, so they survive swapping cables. kanshi applies them on every login and hotplug.
+
 ### Temperature Monitoring
 
 Shows highest temperature across all devices:
@@ -164,8 +178,8 @@ Two dwl binaries exist for different use cases:
 
 | Binary | Description |
 |--------|-------------|
-| `dwl` | Work mode — normal gaps, bar, standard tiling |
-| `dwl-game` | Game mode — no gaps, no bar, master window spans both monitors |
+| `dwl` | Work mode: normal gaps, bar, standard tiling |
+| `dwl-game` | Game mode: no gaps, no bar, master window spans both monitors |
 
 Login always starts `dwl`. To switch to game mode:
 
