@@ -57,6 +57,9 @@ static const MonitorRule monrules[] = {
 	/* example of a HiDPI laptop monitor:
 	{ "eDP-1",    0.5f,  1,      2,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL,   -1,  -1 },
 	*/
+	/* dwl-game runs without kanshi, so pin the saved left-to-right order here */
+	{ "HDMI-A-1", 0.55f, 1,      1,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL,   0,    0 },
+	{ "DP-1",     0.55f, 1,      1,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL,   2560, 0 },
 	/* defaults */
 	{ NULL,       0.55f, 1,      1,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL,   -1,  -1 },
 };
