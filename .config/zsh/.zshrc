@@ -165,11 +165,11 @@ alias \
 # }
 
 # -----------------------------------------------------------------------------
-# yazi: open in ~/Documents when no path is given
+# yazi: open in ~/Documents when no path is given from $HOME
 # -----------------------------------------------------------------------------
 yazi() {
-    if [ $# -eq 0 ]; then
-        command yazi "${HOME}/Documents/ricardo"
+    if [ $# -eq 0 ] && [ "$PWD" = "$HOME" ]; then
+        command yazi "${HOME}/Documents"
     else
         command yazi "$@"
     fi
