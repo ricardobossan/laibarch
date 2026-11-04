@@ -12,7 +12,14 @@ if [[ ! -f "$SSH_AUTH_SOCK" ]]; then
 fi
 
 # Start DWL on TTY1
-if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
+if [[ -o interactive ]] && [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
+    # slstatus queries the default sink from its first tick, so wait for
+    # WirePlumber to pick one (up to 5s, for machines with no audio device).
+    for _ in {1..50}; do
+        wpctl inspect @DEFAULT_AUDIO_SINK@ >/dev/null 2>&1 && break
+        sleep 0.1
+    done
+
     echo "$(date): Starting dwl" >> /tmp/dwl-debug.log
     slstatus -s | dwl -s ~/.local/bin/dwl-autostart.sh
     echo "$(date): dwl exited with code $?" >> /tmp/dwl-debug.log
