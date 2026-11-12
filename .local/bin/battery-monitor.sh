@@ -26,9 +26,9 @@ if [ "$CAPACITY" -le 10 ]; then
         notify-send -u critical "Battery Critical!" "Battery at ${CAPACITY}% - Plug in immediately!"
         echo "critical" > "$STATE_FILE"
     fi
-elif [ "$CAPACITY" -le 20 ]; then
+elif [ "$CAPACITY" -le 30 ]; then
     if [ "$LAST_STATE" != "warning" ] && [ "$LAST_STATE" != "critical" ]; then
-        notify-send -u normal "Battery Low" "Battery at ${CAPACITY}% - Consider plugging in"
+        notify-send -u normal "Battery Low" "Battery at ${CAPACITY}% - Plug in the charger"
         echo "warning" > "$STATE_FILE"
     fi
 else
