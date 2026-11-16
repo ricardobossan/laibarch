@@ -116,3 +116,4 @@ pipewire
 pipewire-pulse
 wireplumber
 whisper-cpp
+openbsd-netcat

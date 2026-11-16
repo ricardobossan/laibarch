@@ -119,6 +119,12 @@ Downloads and builds additional software from source (neovim, brave, etc.).
 
 Initializes pacman keyring, enables parallel downloads.
 
+### `scripts/setup-netbird.sh`
+
+**Run from**: manually by the user on every machine joining the NetBird network
+
+Uses NetBird's own installer (`https://pkgs.netbird.io/install.sh`) to install or update the NetBird client: CLI only, with the binary in `/usr/bin` (not tracked by pacman) and the `netbird` system service. Before execution, it displays the installer's SHA-256 and requests confirmation because the installer does not verify a checksum. Run it again to update. To pin a release, set `NETBIRD_RELEASE=v0.x.y`. Afterwards, log in by running `sudo netbird up` once on each machine.
+
 ---
 
 ## Installed Packages
@@ -226,7 +232,7 @@ Click widget shows detailed per-component temperatures.
 
 Wayland apps do not capture the screen directly; they request a stream over the
 `org.freedesktop.portal.ScreenCast` D-Bus interface. dwl is wlroots-based, so that
-interface is only provided by `xdg-desktop-portal-wlr` — `xdg-desktop-portal-gtk`
+interface is only provided by `xdg-desktop-portal-wlr`; `xdg-desktop-portal-gtk`
 has no ScreenCast implementation on wlroots and leaves OBS with no selectable source.
 
 **Pieces involved (all tracked, nothing to run by hand):**
@@ -239,7 +245,7 @@ has no ScreenCast implementation on wlroots and leaves OBS with no selectable so
 | `~/.config/xdg-desktop-portal/portals.conf` | home repo | routes ScreenCast/Screenshot to `wlr`, all else to `gtk` |
 | `~/.config/xdg-desktop-portal-wlr/config` | home repo | output picker (`slurp`), fps cap |
 
-`xdg-desktop-portal-wlr.service` is D-Bus activated — it needs no `systemctl enable`, but
+`xdg-desktop-portal-wlr.service` is D-Bus activated; it needs no `systemctl enable`, but
 it does declare `ConditionEnvironment=WAYLAND_DISPLAY`, which is why `dwl-autostart.sh`
 calls `dbus-update-activation-environment --systemd` (the `--systemd` flag pushes the
 variables into the `systemd --user` environment, not just the D-Bus one).
@@ -290,9 +296,9 @@ Login always starts `dwl`. To enter game mode, exit dwl (`MOD+Shift+Q`) and run 
 `dwl.c` was patched in the `tile()` function to respect a `fixedmasterwidth` constant: when non-zero, the master window is forced to exactly that pixel width instead of using `mfact`. This allows the master window to span across both monitors when dwl is tiling across them.
 
 `config-game.h` sets:
-- `fixedmasterwidth` — master window width in pixels, set to the sum of both monitor widths
-- `gaps = 0`, `gappx = 0`, `borderpx = 0` — no wasted pixels
-- `showbar = 0` — no status bar
+- `fixedmasterwidth`: master window width in pixels, set to the sum of both monitor widths
+- `gaps = 0`, `gappx = 0`, `borderpx = 0`: no wasted pixels
+- `showbar = 0`: no status bar
 
 ### Adapting to your monitor setup
 
@@ -330,7 +336,7 @@ The Makefile handles the two configs automatically:
 
 ### When to rebuild
 
-Rebuild any time you change `config.def.h`, `config-game.h`, or `dwl.c`. The `make` step takes ~10 seconds. After `sudo make install`, the new binaries are live immediately — no restart needed until you next launch dwl.
+Rebuild any time you change `config.def.h`, `config-game.h`, or `dwl.c`. The `make` step takes ~10 seconds. After `sudo make install`, the new binaries are live immediately; no restart needed until you next launch dwl.
 
 ---
 
