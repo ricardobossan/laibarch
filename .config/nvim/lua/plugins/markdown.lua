@@ -74,6 +74,10 @@ return {
       require("lazy").load({ plugins = { "markdown-preview.nvim" } })
       vim.fn["mkdp#util#install"]()
     end,
+    init = function()
+      -- Replaces the plugin's default markdown.css (copy of it + full-width override)
+      vim.g.mkdp_markdown_css = vim.fn.stdpath("config") .. "/css/markdown-preview.css"
+    end,
     keys = {
       {
         "<leader>cp",
