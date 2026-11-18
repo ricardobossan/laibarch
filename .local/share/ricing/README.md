@@ -69,7 +69,6 @@ Reboot and DWL starts automatically.
 ├── laibarch-install.sh          # Main: Post-installation (run after boot)
 ├── create-repo-iso.sh            # Helper: Build repository ISO
 ├── programs.txt                  # Package list for pacman
-├── dwl-status-click.sh           # Status bar click handler
 ├── scripts/
 │   ├── encrypted-arch-install.sh # Main: Base installation (from live ISO)
 │   ├── chroot-configure.sh       # System configuration (run in chroot)

@@ -44,15 +44,9 @@ else
     echo "Skipping dwl installation."
 fi
 
-# Install dwl status click handler and brightness script
-echo "Installing status bar scripts..."
-mkdir -p ${HOME}/.local/bin
+# User scripts (brightness.sh, dwl-status-click.sh, ...) are tracked in ~/.local/bin
+# and arrive with the repo copy in laibarch-install.sh, so nothing to install here.
 mkdir -p ${HOME}/Documents/Pictures/screenshots
-cp "$SCRIPT_DIR/../dwl-status-click.sh" ${HOME}/.local/bin/
-cp "$SCRIPT_DIR/../brightness.sh" ${HOME}/.local/bin/
-chmod +x ${HOME}/.local/bin/dwl-status-click.sh
-chmod +x ${HOME}/.local/bin/brightness.sh
-echo "Scripts installed successfully!"
 
 # Stow system configs
 #cd "$REPO_ROOT/root" && sudo stow -t / .
