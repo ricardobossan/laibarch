@@ -87,6 +87,7 @@ swaylock
 libnotify
 python-pip
 python-pipx
+python-xlib
 ksnip
 translate-shell
 zathura-pdf-mupdf

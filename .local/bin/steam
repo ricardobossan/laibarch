@@ -1,23 +1,77 @@
 #!/bin/sh
 
-# Steam launcher using a dedicated Xwayland instance spanning both monitors.
+# Start Steam on a separate root-privileged Xwayland server at display :1.
 #
-# Spawns Xwayland on :1 with a single 5120x1440 virtual output so games see
-# it as one display. Connects to the running dwl Wayland session. Kills :1
-# after Steam exits so nothing leaks into the regular session.
+# At startup, determine the X display dimensions from the connected monitors
+# instead of relying on fixed values:
+#   one monitor   -> fullscreen using its current resolution
+#   multiple      -> one virtual display wide enough to span them all
 #
-# For single-monitor or Wayland-native games, use 'steam' instead.
+# Fullscreen by itself uses a 640x480 X screen that the compositor scales up,
+# making Steam look oversized and blurry; -geometry sets the real dimensions.
+#
+# Stop :1 when Steam closes to avoid leaving an extra server in the session.
 
-COMBINED=$(wlr-randr 2>/dev/null | awk '
-  /current/ { match($0, /([0-9]+)x([0-9]+)/, m); w+=m[1]; if (m[2]>h) h=m[2] }
-  END { print w "x" h }
+# First, query the active Wayland session.
+SIZES=$(wlr-randr 2>/dev/null | awk '
+  function flush() { if (on && cur) print cur; on = 0; cur = "" }
+  /^[^ ]/            { flush() }
+  /^  Enabled: yes/  { on = 1 }
+  /current/          { match($0, /([0-9]+)x([0-9]+)/, m); cur = m[1] "x" m[2] }
+  END                { flush() }
 ')
-GEOMETRY=${COMBINED:-5120x1440}
 
-Xwayland :1 -geometry "$GEOMETRY" &
+# If that returns nothing, use the kernel's connected-display data and preferred modes.
+if [ -z "$SIZES" ]; then
+  SIZES=$(for c in /sys/class/drm/card*-*; do
+    [ "$(cat "$c/status" 2>/dev/null)" = connected ] && head -n1 "$c/modes" 2>/dev/null
+  done)
+fi
+
+if [ -z "$SIZES" ]; then
+  echo "steam: could not detect the screen size" >&2
+  exit 1
+fi
+
+COUNT=$(printf '%s\n' "$SIZES" | grep -c x)
+GEOMETRY=$(printf '%s\n' "$SIZES" | awk -Fx '{ w += $1; if ($2 > h) h = $2 } END { print w "x" h }')
+
+if [ "$COUNT" -gt 1 ]; then
+  Xwayland :1 -geometry "$GEOMETRY" &
+else
+  Xwayland :1 -fullscreen -geometry "$GEOMETRY" &
+fi
 XWAYLAND_PID=$!
 sleep 1
 
+# Since :1 has no window manager, Steam may restore a saved size (such as
+# 2538x1398 from a larger monitor) and extend beyond the visible area. This
+# watcher resizes oversized Steam windows to fit, while leaving smaller ones
+# (like dialogs and the friends list) unchanged. Requires python-xlib.
+DISPLAY=:1 python3 -I -c '
+import time
+from Xlib import display, error
+d = display.Display()
+s = d.screen()
+W, H = s.width_in_pixels, s.height_in_pixels
+while True:
+    try:
+        for w in s.root.query_tree().children:
+            if w.get_attributes().map_state != 2:
+                continue
+            cls = w.get_wm_class() or ()
+            if "steam" not in cls and "steamwebhelper" not in cls:
+                continue
+            g = w.get_geometry()
+            if g.width > W or g.height > H or g.x + g.width > W or g.y + g.height > H:
+                w.configure(x=0, y=0, width=min(g.width, W), height=min(g.height, H))
+        d.sync()
+    except error.XError:
+        pass
+    time.sleep(1)
+' 2>/dev/null &
+FIT_PID=$!
+
 DISPLAY=:1 flatpak run com.valvesoftware.Steam "$@"
 
-kill $XWAYLAND_PID 2>/dev/null
+kill $FIT_PID $XWAYLAND_PID 2>/dev/null
