@@ -231,7 +231,7 @@ for line in sys.stdin:
     if title in ("[Private video]", "[Deleted video]"):
         continue
     # Video IDs are 11 characters. Playlists have no thumbnail ID of their own, so YouTube
-    # displays the cover video's image; extract that ID from the thumbnail URL for the preview.
+    # displays the image of the cover video; extract that ID from the thumbnail URL for the preview.
     if len(vid) == 11:
         tid, dur = vid, hms(dur)
     else:
