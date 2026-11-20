@@ -7,6 +7,7 @@
 !.config/mimeapps.list
 !.config/shell
 !.config/shell/**/*
+.config/shell/profile.d/
 !.config/nvim/
 !.config/nvim/**/*
 .config/nvim/spell/*

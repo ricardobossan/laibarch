@@ -11,4 +11,11 @@ export XKB_DEFAULT_VARIANT=intl
 # PATH
 export PATH="$PATH:${HOME}/.local/bin:${HOME}/.cargo/bin:${HOME}/.dotnet/tools"
 
-# export ANTHROPIC_API_KEY="$(pass show ai/ANTHROPIC_API_KEY)"
+# Private, machine-local additions (not tracked here)
+# (find instead of a glob: zsh aborts on a glob with no match)
+if [ -d "$HOME/.config/shell/profile.d" ]; then
+    for f in $(find "$HOME/.config/shell/profile.d" -maxdepth 1 -name '*.sh' | sort); do
+        [ -r "$f" ] && . "$f"
+    done
+    unset f
+fi
