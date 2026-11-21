@@ -44,6 +44,25 @@ else
 fi
 echo ""
 
+# Install TPM, then the plugins specified in tmux.conf
+echo "Setting up tmux plugins..."
+if [ -d ~/.config/tmux/plugins/tpm ]; then
+  echo "TPM already present, skipping clone..."
+else
+  git clone --depth 1 https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
+fi
+# Start a server or reload tmux.conf first: `install_plugins` requires a running server with `TMUX_PLUGIN_MANAGER_PATH` defined by the config
+if tmux has-session 2>/dev/null; then
+  tmux source-file ~/.config/tmux/tmux.conf
+  ~/.config/tmux/plugins/tpm/bin/install_plugins
+else
+  tmux new-session -d -s tpm-install
+  ~/.config/tmux/plugins/tpm/bin/install_plugins
+  tmux kill-server
+fi
+echo "TPM and tmux plugins installed!"
+echo ""
+
 # tree-sitter-cli
 echo "Installing tree-sitter-cli..."
 if command -v tree-sitter &>/dev/null; then

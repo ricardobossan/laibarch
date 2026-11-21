@@ -369,8 +369,9 @@ The terminal stack follows the standard architecture: `Kernel -> DWL -> Alacritt
 - Terminal multiplexer (sessions, panes)
 - Prefix: `Ctrl+e` (default `Ctrl+b` unbound)
 - Vim-style pane navigation: `hjkl`
+- Prefix keys `c`, `"` and `%` start windows and splits in the focused pane's directory
 - Vi mode for copy: `set -g mode-keys vi`
-- Plugins via TPM: resurrect, continuum, sessionx, floax, catppuccin theme
+- Plugins via TPM: resurrect, continuum, sessionx, floax, catppuccin theme (`scripts/programs-scripts.sh` installs TPM and its plugins)
 - Auto-restore sessions on start
 
 **Shell** (Zsh, with Bash available)
